@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>exchanges</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>Exchange Tracker</h1>
+      <p class="meta" id="meta">로딩 중...</p>
+
+      <section class="controls">
+        <label for="currency">통화</label>
+        <select id="currency"></select>
+        <div class="quick">
+          <button data-code="USD">USD</button>
+          <button data-code="JPY">JPY</button>
+          <button data-code="CNY">CNY</button>
+          <button data-code="EUR">EUR</button>
+        </div>
+      </section>
+
+      <section class="cards">
+        <div class="card"><span>매매기준율</span><strong id="base">-</strong></div>
+        <div class="card"><span>송금 보낼때</span><strong id="send">-</strong></div>
+        <div class="card"><span>송금 받을때</span><strong id="receive">-</strong></div>
+      </section>
+
+      <section class="chart">
+        <canvas id="chart"></canvas>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
