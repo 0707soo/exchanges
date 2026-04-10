@@ -1,7 +1,7 @@
 let latest;
 let series;
 let chart;
-let mobileCardsOpen = false;
+let detailsOpen = false;
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
@@ -45,8 +45,7 @@ async function load() {
 
   const baseToggle = document.getElementById('base-toggle');
   baseToggle.addEventListener('click', () => {
-    if (!window.matchMedia('(max-width: 720px)').matches) return;
-    mobileCardsOpen = !mobileCardsOpen;
+    detailsOpen = !detailsOpen;
     syncCardsVisibility();
   });
 
@@ -56,18 +55,11 @@ async function load() {
 }
 
 function syncCardsVisibility() {
-  const isMobile = window.matchMedia('(max-width: 720px)').matches;
   const cards = document.getElementById('cards');
   const baseToggle = document.getElementById('base-toggle');
   if (!cards || !baseToggle) return;
-
-  if (isMobile) {
-    cards.classList.toggle('open', mobileCardsOpen);
-    baseToggle.setAttribute('aria-expanded', String(mobileCardsOpen));
-  } else {
-    cards.classList.add('open');
-    baseToggle.setAttribute('aria-expanded', 'true');
-  }
+  cards.classList.toggle('open', detailsOpen);
+  baseToggle.setAttribute('aria-expanded', String(detailsOpen));
 }
 
 function render(code) {
