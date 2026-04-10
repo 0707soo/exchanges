@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -117,25 +118,34 @@ def fetch_html(target_date: datetime) -> str:
         "inqKindCd": "1",
     }
 
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    })
+    last_error: Exception | None = None
+    for i in range(5):
+        try:
+            s = requests.Session()
+            s.headers.update({
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            })
+            s.get(SOURCE_PAGE, timeout=30)
 
-    # 쿠키 준비
-    s.get(SOURCE_PAGE, timeout=30)
+            r = s.post(DATA_ENDPOINT, data=payload, timeout=30)
+            r.raise_for_status()
+            html = r.text
+            if "tblBasic" in html:
+                return html
 
-    r = s.post(DATA_ENDPOINT, data=payload, timeout=30)
-    r.raise_for_status()
-    html = r.text
+            r2 = s.post(DATA_ENDPOINT, data=payload, headers={"Referer": SOURCE_PAGE}, timeout=30)
+            r2.raise_for_status()
+            html = r2.text
+            if "tblBasic" in html:
+                return html
 
-    if "tblBasic" not in html:
-        # 1차 실패 시 referer 포함 재시도
-        r2 = s.post(DATA_ENDPOINT, data=payload, headers={"Referer": SOURCE_PAGE}, timeout=30)
-        r2.raise_for_status()
-        html = r2.text
+            last_error = RuntimeError("환율 테이블 미검출")
+        except Exception as e:
+            last_error = e
 
-    return html
+        time.sleep(2 + i)
+
+    raise RuntimeError(f"환율 수집 실패: {last_error}")
 
 
 def extract_meta(html: str) -> dict:
@@ -232,9 +242,16 @@ def main():
     now_utc = datetime.now(timezone.utc)
     now_kst = now_utc.astimezone(KST)
 
-    html = fetch_html(now_kst)
-    meta = extract_meta(html)
-    rows = extract_rows(html)
+    try:
+        html = fetch_html(now_kst)
+        meta = extract_meta(html)
+        rows = extract_rows(html)
+    except Exception as e:
+        latest_path = DATA_DIR / "latest.json"
+        if latest_path.exists():
+            print(f"skip update: {e}")
+            return
+        raise
 
     rates = {r.code: r.base_rate for r in rows}
     row_map = {
