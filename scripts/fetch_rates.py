@@ -260,6 +260,20 @@ def rebuild_series():
         json.dumps({"series": series}, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
+    # 기간별 경량 파일
+    (DATA_DIR / "series-1d.json").write_text(
+        json.dumps({"series": {k: v[-144:] for k, v in series.items()}}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (DATA_DIR / "series-7d.json").write_text(
+        json.dumps({"series": {k: v[-1008:] for k, v in series.items()}}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (DATA_DIR / "series-30d.json").write_text(
+        json.dumps({"series": {k: v[-3000:] for k, v in series.items()}}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
 
 def main():
     now_utc = datetime.now(timezone.utc)

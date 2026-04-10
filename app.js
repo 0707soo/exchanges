@@ -1,7 +1,8 @@
 let latest;
-let series;
+let seriesByPeriod = {};
 let chart;
 let detailsOpen = false;
+let currentPeriod = '1d';
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
@@ -20,10 +21,10 @@ const toKstShort = (iso) => new Intl.DateTimeFormat('ko-KR', {
 async function load() {
   const [l, s] = await Promise.all([
     fetch('./data/latest.json', { cache: 'no-store' }).then(r => r.json()),
-    fetch('./data/series.json', { cache: 'no-store' }).then(r => r.json()),
+    fetch('./data/series-1d.json', { cache: 'no-store' }).then(r => r.json()),
   ]);
   latest = l;
-  series = s.series || {};
+  seriesByPeriod['1d'] = s.series || {};
 
   const currency = document.getElementById('currency');
   const codes = Object.keys(latest.rows).sort();
@@ -37,6 +38,17 @@ async function load() {
         currency.value = btn.dataset.code;
         render(btn.dataset.code);
       }
+    });
+  });
+
+  document.querySelectorAll('#periods [data-period]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const period = btn.dataset.period;
+      if (!period || period === currentPeriod) return;
+      await ensureSeries(period);
+      currentPeriod = period;
+      document.querySelectorAll('#periods [data-period]').forEach(b => b.classList.toggle('active', b.dataset.period === period));
+      render(currency.value);
     });
   });
 
@@ -70,6 +82,7 @@ function render(code) {
   document.getElementById('send').textContent = fmt(row.send);
   document.getElementById('receive').textContent = fmt(row.receive);
 
+  const series = seriesByPeriod[currentPeriod] || {};
   const points = series[code] || [];
   const labels = points.map(p => toKstShort(p.t));
   const values = points.map(p => p.v);
@@ -100,6 +113,17 @@ function render(code) {
       plugins: { legend: { labels: { color: '#e8eefc' } } }
     }
   });
+}
+
+async function ensureSeries(period) {
+  if (seriesByPeriod[period]) return;
+  const map = {
+    '7d': './data/series-7d.json',
+    '30d': './data/series-30d.json',
+  };
+  const path = map[period] || './data/series-1d.json';
+  const data = await fetch(path, { cache: 'no-store' }).then(r => r.json());
+  seriesByPeriod[period] = data.series || {};
 }
 
 load().catch(err => {
