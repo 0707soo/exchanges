@@ -9,6 +9,12 @@ const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
   hour: '2-digit', minute: '2-digit', second: '2-digit',
   hour12: false,
 }).format(new Date(iso));
+const toKstShort = (iso) => new Intl.DateTimeFormat('ko-KR', {
+  timeZone: 'Asia/Seoul',
+  month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit',
+  hour12: false,
+}).format(new Date(iso));
 
 async function load() {
   const [l, s] = await Promise.all([
@@ -33,7 +39,8 @@ async function load() {
     });
   });
 
-  document.getElementById('meta').textContent = `고시: ${latest.published_text || '-'} (${latest.sequence || '-'}회차) · 수집(KST, UTC+9): ${toKst(latest.captured_at_utc)}`;
+  document.getElementById('meta-published').textContent = `고시: ${latest.published_text || '-'} (${latest.sequence || '-'}회차)`;
+  document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${toKst(latest.captured_at_utc)}`;
   render(currency.value);
 }
 
@@ -46,7 +53,7 @@ function render(code) {
   document.getElementById('receive').textContent = fmt(row.receive);
 
   const points = series[code] || [];
-  const labels = points.map(p => p.t.replace('T', ' ').slice(0, 16));
+  const labels = points.map(p => toKstShort(p.t));
   const values = points.map(p => p.v);
 
   if (chart) chart.destroy();
@@ -78,5 +85,6 @@ function render(code) {
 }
 
 load().catch(err => {
-  document.getElementById('meta').textContent = '데이터 로드 실패: ' + err.message;
+  document.getElementById('meta-published').textContent = '고시: 데이터 로드 실패';
+  document.getElementById('meta-collected').textContent = '오류: ' + err.message;
 });

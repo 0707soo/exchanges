@@ -153,9 +153,22 @@ def extract_meta(html: str) -> dict:
     pub_date = re.search(r"고시일시</em>\s*:\s*<strong>\s*([^<]+)\s*</strong>\s*<strong>\s*([^<]+)\s*</strong>", html)
     seq = re.search(r"\((\d+)회차\)", html)
     view = re.search(r"조회시각</em>\s*:\s*<strong>\s*([^<]+)\s*</strong>", html)
+    published_text = (f"{pub_date.group(1).strip()} {pub_date.group(2).strip()}") if pub_date else None
+    published_at_kst = None
+    if published_text:
+        m = re.search(r"(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{2})시\s*(\d{2})분\s*(\d{2})초", published_text)
+        if m:
+            dt = datetime(
+                int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                int(m.group(4)), int(m.group(5)), int(m.group(6)),
+                tzinfo=KST,
+            )
+            published_at_kst = dt.isoformat()
+
     return {
         "basis_date_text": basis.group(1).strip() if basis else None,
-        "published_text": (f"{pub_date.group(1).strip()} {pub_date.group(2).strip()}") if pub_date else None,
+        "published_text": published_text,
+        "published_at_kst": published_at_kst,
         "sequence": int(seq.group(1)) if seq else None,
         "viewed_text": view.group(1).strip() if view else None,
     }
@@ -226,7 +239,17 @@ def rebuild_series():
                 if not line:
                     continue
                 snap = json.loads(line)
-                ts = snap["captured_at_utc"]
+                ts = snap.get("published_at_kst")
+                if not ts and snap.get("published_text"):
+                    m = re.search(r"(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{2})시\s*(\d{2})분\s*(\d{2})초", snap["published_text"])
+                    if m:
+                        ts = datetime(
+                            int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                            int(m.group(4)), int(m.group(5)), int(m.group(6)),
+                            tzinfo=KST,
+                        ).isoformat()
+                if not ts:
+                    ts = snap["captured_at_utc"]
                 for code, v in snap["rates"].items():
                     series.setdefault(code, []).append({"t": ts, "v": v})
 

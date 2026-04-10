@@ -3,6 +3,7 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #0b1220; color
 .wrap { max-width: 1000px; margin: 0 auto; padding: 20px; }
 h1 { margin: 0 0 8px; }
 .meta { color: #9fb0d0; margin: 0 0 16px; font-size: 14px; }
+.meta-line { margin: 2px 0; }
 .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
 select, button { background: #17233b; color: #e8eefc; border: 1px solid #2f446f; border-radius: 8px; padding: 8px 10px; }
 .quick { display: flex; gap: 6px; }
