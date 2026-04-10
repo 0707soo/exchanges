@@ -3,6 +3,12 @@ let series;
 let chart;
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
+const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit',
+  hour12: false,
+}).format(new Date(iso));
 
 async function load() {
   const [l, s] = await Promise.all([
@@ -27,7 +33,7 @@ async function load() {
     });
   });
 
-  document.getElementById('meta').textContent = `고시: ${latest.published_text || '-'} (${latest.sequence || '-'}회차) · 수집(UTC): ${latest.captured_at_utc}`;
+  document.getElementById('meta').textContent = `고시: ${latest.published_text || '-'} (${latest.sequence || '-'}회차) · 수집(KST, UTC+9): ${toKst(latest.captured_at_utc)}`;
   render(currency.value);
 }
 
