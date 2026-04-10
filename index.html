@@ -26,10 +26,16 @@
         </div>
       </section>
 
-      <section class="cards">
-        <div class="card"><span>매매기준율</span><strong id="base">-</strong></div>
-        <div class="card"><span>송금 보낼때</span><strong id="send">-</strong></div>
-        <div class="card"><span>송금 받을때</span><strong id="receive">-</strong></div>
+      <section class="cards" id="cards">
+        <button class="card card-main" id="base-toggle" aria-expanded="false" aria-controls="extra-cards" type="button">
+          <span>매매기준율</span>
+          <strong id="base">-</strong>
+          <small class="mobile-hint">터치해서 송금 환율 보기</small>
+        </button>
+        <div class="extra-cards" id="extra-cards">
+          <div class="card"><span>송금 보낼때</span><strong id="send">-</strong></div>
+          <div class="card"><span>송금 받을때</span><strong id="receive">-</strong></div>
+        </div>
       </section>
 
       <section class="chart">
