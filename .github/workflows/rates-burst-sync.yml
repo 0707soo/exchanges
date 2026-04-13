@@ -127,7 +127,7 @@ jobs:
           latest = json.loads(latest_path.read_text(encoding='utf-8')) if latest_path.exists() else {}
           previous = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
           now_kst = datetime.now(ZoneInfo('Asia/Seoul'))
-          allow_chain = 6 <= now_kst.hour < 22
+          is_daytime = 6 <= now_kst.hour < 22
           failure_streak = 0 if any_success else int(previous.get('failure_streak', 0)) + 1
           total_failures = int(previous.get('total_failures', 0)) + (0 if any_success else 1)
           status = {
@@ -148,8 +148,10 @@ jobs:
               'latest_sequence': latest.get('sequence'),
               'failure_streak': failure_streak,
               'total_failures': total_failures,
-              'chain_allowed_now': allow_chain,
+              'chain_allowed_now': True,
               'chain_timezone': 'Asia/Seoul',
+              'chain_mode': 'daytime' if is_daytime else 'night',
+              'next_delay_seconds': 0 if is_daytime else 1200,
           }
           status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
 
@@ -157,7 +159,8 @@ jobs:
           with github_output.open('a', encoding='utf-8') as f:
               f.write(f"had_success={'true' if any_success else 'false'}\n")
               f.write(f"push_count={pushed_count}\n")
-              f.write(f"allow_chain={'true' if allow_chain else 'false'}\n")
+              f.write("allow_chain=true\n")
+              f.write(f"next_delay_seconds={0 if is_daytime else 1200}\n")
           print(json.dumps(status, ensure_ascii=False))
           PY
         env:
@@ -181,6 +184,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          delay="${{ steps.poll.outputs.next_delay_seconds || '0' }}"
+          if [ "$delay" != "0" ]; then
+            sleep "$delay"
+          fi
           gh workflow run rates-burst-sync.yml \
             --repo 0707soo/exchanges \
             -f continue_chain=true \
