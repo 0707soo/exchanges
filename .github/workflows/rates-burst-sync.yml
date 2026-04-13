@@ -1,15 +1,25 @@
 name: rates-burst-sync
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'
   workflow_dispatch:
+    inputs:
+      continue_chain:
+        description: 'Keep dispatching the next run automatically'
+        required: false
+        default: true
+        type: boolean
+      trigger_reason:
+        description: 'Why this run was started'
+        required: false
+        default: 'manual'
+        type: string
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
-  group: exchanges-update-rates
+  group: exchanges-rate-sync-chain
   cancel-in-progress: false
 
 jobs:
@@ -55,7 +65,6 @@ jobs:
           any_success = False
           last_error = None
           attempt_logs = []
-
 
           for idx in range(attempts):
               ts = datetime.now(timezone.utc).isoformat()
@@ -113,7 +122,8 @@ jobs:
           total_failures = int(previous.get('total_failures', 0)) + (0 if any_success else 1)
           status = {
               'source': 'hanabank',
-              'poll_mode': 'every-5-minutes-with-30-second-burst-and-immediate-push',
+              'poll_mode': 'self-dispatch-chain-with-30-second-burst',
+              'trigger_reason': os.environ.get('TRIGGER_REASON', 'manual'),
               'window_started_at_utc': started_at.isoformat(),
               'window_ended_at_utc': datetime.now(timezone.utc).isoformat(),
               'attempt_count': len(attempt_logs),
@@ -137,6 +147,8 @@ jobs:
               f.write(f"push_count={pushed_count}\n")
           print(json.dumps(status, ensure_ascii=False))
           PY
+        env:
+          TRIGGER_REASON: ${{ inputs.trigger_reason || 'manual' }}
 
       - name: Commit final status
         if: always()
@@ -150,6 +162,16 @@ jobs:
           fi
           git commit -m "chore: update exchange fetch status (auto)"
           git push
+
+      - name: Queue next run
+        if: always() && inputs.continue_chain != false
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run rates-burst-sync.yml \
+            --repo 0707soo/exchanges \
+            -f continue_chain=true \
+            -f trigger_reason=auto-chain
 
       - name: Fail if all attempts failed
         if: steps.poll.outputs.had_success != 'true'
