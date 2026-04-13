@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from dataclasses import dataclass
@@ -19,6 +20,7 @@ HISTORY_DIR = DATA_DIR / "history"
 SOURCE_PAGE = "https://hanabank.com/cont/mall/mall15/mall1501/index.jsp"
 DATA_ENDPOINT = "https://hanabank.com/cms/rate/wpfxd651_01i_01.do"
 KST = ZoneInfo("Asia/Seoul")
+MAX_STALE_MINUTES = int(os.getenv("MAX_STALE_MINUTES", "40"))
 
 
 @dataclass
@@ -217,6 +219,25 @@ def load_last_snapshot(path: Path) -> dict | None:
     return last
 
 
+def load_json(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def get_snapshot_age_minutes(snapshot: dict, now_utc: datetime) -> float | None:
+    captured = snapshot.get("captured_at_utc")
+    if not captured:
+        return None
+    try:
+        captured_dt = datetime.fromisoformat(captured)
+    except ValueError:
+        return None
+    if captured_dt.tzinfo is None:
+        captured_dt = captured_dt.replace(tzinfo=timezone.utc)
+    return (now_utc - captured_dt.astimezone(timezone.utc)).total_seconds() / 60
+
+
 def append_snapshot(snapshot: dict):
     HISTORY_DIR.mkdir(parents=True, exist_ok=True)
     month_file = HISTORY_DIR / f"{datetime.now(KST).strftime('%Y-%m')}.ndjson"
@@ -278,16 +299,24 @@ def rebuild_series():
 def main():
     now_utc = datetime.now(timezone.utc)
     now_kst = now_utc.astimezone(KST)
+    latest_path = DATA_DIR / "latest.json"
 
     try:
         html = fetch_html(now_kst)
         meta = extract_meta(html)
         rows = extract_rows(html)
     except Exception as e:
-        latest_path = DATA_DIR / "latest.json"
-        if latest_path.exists():
-            print(f"skip update: {e}")
-            return
+        previous = load_json(latest_path)
+        if previous:
+            age_minutes = get_snapshot_age_minutes(previous, now_utc)
+            if age_minutes is not None and age_minutes <= MAX_STALE_MINUTES:
+                print(f"temporary fetch failure, keeping fresh snapshot ({age_minutes:.1f}m old): {e}")
+                return
+            raise RuntimeError(
+                f"환율 수집 실패가 지속되어 최신 데이터가 {age_minutes:.1f}분 이상 갱신되지 않았습니다: {e}"
+                if age_minutes is not None
+                else f"환율 수집 실패 및 기존 데이터 시각 확인 실패: {e}"
+            )
         raise
 
     rates = {r.code: r.base_rate for r in rows}
