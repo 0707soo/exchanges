@@ -25,7 +25,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 7
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Poll with safer cadence
+      - name: Poll with calmer cadence
         id: poll
         run: |
           python - <<'PY'
@@ -60,8 +60,8 @@ jobs:
           fetch_log_path = root / 'fetch.log'
 
           started_at = datetime.now(timezone.utc)
-          attempts = 5
-          interval_seconds = 90
+          attempts = 3
+          interval_seconds = 120
           push_every_attempts = 2
           pushed_count = 0
           any_success = False
@@ -132,7 +132,7 @@ jobs:
           total_failures = int(previous.get('total_failures', 0)) + (0 if any_success else 1)
           status = {
               'source': 'hanabank',
-              'poll_mode': 'self-dispatch-chain-with-90-second-burst-and-3-minute-push',
+              'poll_mode': 'self-dispatch-chain-with-120-second-burst-and-batched-push',
               'trigger_reason': os.environ.get('TRIGGER_REASON', 'manual'),
               'window_started_at_utc': started_at.isoformat(),
               'window_ended_at_utc': datetime.now(timezone.utc).isoformat(),
