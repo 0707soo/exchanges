@@ -25,7 +25,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Poll for changes and push immediately
+      - name: Poll with safer cadence
         id: poll
         run: |
           python - <<'PY'
@@ -50,6 +50,7 @@ jobs:
           import time
           from datetime import datetime, timezone
           from pathlib import Path
+          from zoneinfo import ZoneInfo
 
           root = Path('.')
           data_dir = root / 'data'
@@ -59,12 +60,14 @@ jobs:
           fetch_log_path = root / 'fetch.log'
 
           started_at = datetime.now(timezone.utc)
-          attempts = 7
-          interval_seconds = 30
+          attempts = 5
+          interval_seconds = 90
+          push_every_attempts = 2
           pushed_count = 0
           any_success = False
           last_error = None
           attempt_logs = []
+          pending_commit = False
 
           for idx in range(attempts):
               ts = datetime.now(timezone.utc).isoformat()
@@ -104,6 +107,10 @@ jobs:
                   last_error = lines[-1] if lines else f'fetch failed with exit code {proc.returncode}'
 
               if changed:
+                  pending_commit = True
+
+              should_push_now = pending_commit and (((idx + 1) % push_every_attempts == 0) or (idx == attempts - 1))
+              if should_push_now:
                   subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
                   subprocess.run(['git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], check=True)
                   subprocess.run('git add data/*.json data/history/*.ndjson || true', shell=True, check=True)
@@ -112,17 +119,20 @@ jobs:
                       subprocess.run(['git', 'commit', '-m', 'chore: update exchange rates (auto)'], check=True)
                       subprocess.run(['git', 'push'], check=True)
                       pushed_count += 1
+                  pending_commit = False
 
               if idx < attempts - 1:
                   time.sleep(interval_seconds)
 
           latest = json.loads(latest_path.read_text(encoding='utf-8')) if latest_path.exists() else {}
           previous = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
+          now_kst = datetime.now(ZoneInfo('Asia/Seoul'))
+          allow_chain = 6 <= now_kst.hour < 22
           failure_streak = 0 if any_success else int(previous.get('failure_streak', 0)) + 1
           total_failures = int(previous.get('total_failures', 0)) + (0 if any_success else 1)
           status = {
               'source': 'hanabank',
-              'poll_mode': 'self-dispatch-chain-with-30-second-burst',
+              'poll_mode': 'self-dispatch-chain-with-90-second-burst-and-3-minute-push',
               'trigger_reason': os.environ.get('TRIGGER_REASON', 'manual'),
               'window_started_at_utc': started_at.isoformat(),
               'window_ended_at_utc': datetime.now(timezone.utc).isoformat(),
@@ -138,6 +148,8 @@ jobs:
               'latest_sequence': latest.get('sequence'),
               'failure_streak': failure_streak,
               'total_failures': total_failures,
+              'chain_allowed_now': allow_chain,
+              'chain_timezone': 'Asia/Seoul',
           }
           status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
 
@@ -145,6 +157,7 @@ jobs:
           with github_output.open('a', encoding='utf-8') as f:
               f.write(f"had_success={'true' if any_success else 'false'}\n")
               f.write(f"push_count={pushed_count}\n")
+              f.write(f"allow_chain={'true' if allow_chain else 'false'}\n")
           print(json.dumps(status, ensure_ascii=False))
           PY
         env:
@@ -164,7 +177,7 @@ jobs:
           git push
 
       - name: Queue next run
-        if: always() && inputs.continue_chain != false
+        if: always() && inputs.continue_chain != false && steps.poll.outputs.allow_chain == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
