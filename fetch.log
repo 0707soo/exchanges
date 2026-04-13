@@ -1,65 +1,58 @@
 [
   {
-    "attempted_at_utc": "2026-04-13T09:15:52.098910+00:00",
+    "attempted_at_utc": "2026-04-13T09:47:05.186974+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=True sequence=587"
+      "rows=58 changed=True sequence=604"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-13T09:16:59.003055+00:00",
+    "attempted_at_utc": "2026-04-13T09:48:08.282977+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=False sequence=587"
+      "rows=58 changed=True sequence=605"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-13T09:18:06.453704+00:00",
+    "attempted_at_utc": "2026-04-13T09:49:10.975053+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=True sequence=589"
+      "rows=58 changed=False sequence=605"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-13T09:19:09.572104+00:00",
+    "attempted_at_utc": "2026-04-13T09:50:16.218936+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=True sequence=590"
+      "rows=58 changed=True sequence=606"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-13T09:20:14.516147+00:00",
+    "attempted_at_utc": "2026-04-13T09:51:18.830980+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=False sequence=590"
+      "rows=58 changed=False sequence=606"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-13T09:21:17.402500+00:00",
+    "attempted_at_utc": "2026-04-13T09:52:20.754658+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=True sequence=591"
+      "rows=58 changed=False sequence=606"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-13T09:22:19.293451+00:00",
+    "attempted_at_utc": "2026-04-13T09:53:23.438736+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=False sequence=591"
+      "rows=58 changed=True sequence=607"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-13T09:23:24.727228+00:00",
+    "attempted_at_utc": "2026-04-13T09:54:25.992487+00:00",
     "exit_code": 0,
     "log_excerpt": [
-      "rows=58 changed=False sequence=591"
-    ]
-  },
-  {
-    "attempted_at_utc": "2026-04-13T09:24:31.893203+00:00",
-    "exit_code": 0,
-    "log_excerpt": [
-      "rows=58 changed=False sequence=591"
+      "rows=58 changed=False sequence=607"
     ]
   }
 ]
