@@ -2,15 +2,20 @@ name: update-rates
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: exchanges-update-rates
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 9
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,21 +28,14 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Fetch rates
-        id: fetch
-        run: |
-          set +e
-          python scripts/fetch_rates.py 2>&1 | tee fetch.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit 0
-
-      - name: Write fetch status
-        if: always()
+      - name: Poll for 9 minutes
+        id: poll
         run: |
           python - <<'PY'
           import json
-          from datetime import datetime, timezone
+          import subprocess
+          import time
+          from datetime import datetime, timedelta, timezone
           from pathlib import Path
 
           root = Path('.')
@@ -45,20 +43,54 @@ jobs:
           data_dir.mkdir(parents=True, exist_ok=True)
           latest_path = data_dir / 'latest.json'
           status_path = data_dir / 'status.json'
-          fetch_log = (root / 'fetch.log').read_text(encoding='utf-8') if (root / 'fetch.log').exists() else ''
+          fetch_log_path = root / 'fetch.log'
+
+          started_at = datetime.now(timezone.utc)
+          deadline = started_at + timedelta(minutes=9)
+          attempt_logs = []
+          any_success = False
+          last_error = None
+
+          while datetime.now(timezone.utc) < deadline:
+              ts = datetime.now(timezone.utc).isoformat()
+              proc = subprocess.run(
+                  ['python', 'scripts/fetch_rates.py'],
+                  capture_output=True,
+                  text=True,
+              )
+              combined = '\n'.join(x for x in [proc.stdout.strip(), proc.stderr.strip()] if x).strip()
+              lines = [line for line in combined.splitlines() if line.strip()]
+              entry = {
+                  'attempted_at_utc': ts,
+                  'exit_code': proc.returncode,
+                  'log_excerpt': lines[-5:],
+              }
+              attempt_logs.append(entry)
+              fetch_log_path.write_text(json.dumps(attempt_logs, ensure_ascii=False, indent=2), encoding='utf-8')
+
+              if proc.returncode == 0:
+                  any_success = True
+                  last_error = None
+              else:
+                  last_error = lines[-1] if lines else f'fetch failed with exit code {proc.returncode}'
+
+              time.sleep(60)
+
           latest = json.loads(latest_path.read_text(encoding='utf-8')) if latest_path.exists() else {}
           previous = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
-          exit_code = int('${{ steps.fetch.outputs.exit_code || 1 }}')
-          success = exit_code == 0
-          failure_streak = 0 if success else int(previous.get('failure_streak', 0)) + 1
-          total_failures = int(previous.get('total_failures', 0)) + (0 if success else 1)
+          failure_streak = 0 if any_success else int(previous.get('failure_streak', 0)) + 1
+          total_failures = int(previous.get('total_failures', 0)) + (0 if any_success else 1)
           status = {
               'source': 'hanabank',
-              'poll_mode': 'every-5-minutes',
-              'last_attempt_at_utc': datetime.now(timezone.utc).isoformat(),
-              'last_attempt_success': success,
-              'last_error': None if success else (fetch_log.strip().splitlines()[-1] if fetch_log.strip() else 'fetch failed'),
-              'last_log_excerpt': fetch_log.strip().splitlines()[-10:],
+              'poll_mode': 'every-10-minutes-with-1-minute-burst',
+              'window_started_at_utc': started_at.isoformat(),
+              'window_ended_at_utc': datetime.now(timezone.utc).isoformat(),
+              'attempt_count': len(attempt_logs),
+              'last_attempt_at_utc': attempt_logs[-1]['attempted_at_utc'] if attempt_logs else None,
+              'last_attempt_success': any_success,
+              'last_error': last_error,
+              'last_log_excerpt': attempt_logs[-1]['log_excerpt'] if attempt_logs else [],
+              'attempt_logs': attempt_logs[-10:],
               'latest_published_at_kst': latest.get('published_at_kst'),
               'latest_captured_at_utc': latest.get('captured_at_utc'),
               'latest_sequence': latest.get('sequence'),
@@ -66,6 +98,10 @@ jobs:
               'total_failures': total_failures,
           }
           status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
+
+          github_output = Path(__import__('os').environ['GITHUB_OUTPUT'])
+          with github_output.open('a', encoding='utf-8') as f:
+              f.write(f"had_success={'true' if any_success else 'false'}\n")
           print(json.dumps(status, ensure_ascii=False))
           PY
 
@@ -75,7 +111,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/*.json data/history/*.ndjson fetch.log || true
-          git reset -- fetch.log || true
           if git diff --cached --quiet; then
             echo "No changes"
             exit 0
@@ -83,8 +118,8 @@ jobs:
           git commit -m "chore: update exchange rates (auto)"
           git push
 
-      - name: Fail if fetch failed
-        if: steps.fetch.outputs.exit_code != '0'
+      - name: Fail if all attempts failed
+        if: steps.poll.outputs.had_success != 'true'
         run: |
-          echo "Exchange rate fetch failed. See fetch.log and data/status.json for details."
+          echo "Exchange rate fetch failed for the entire polling window. See fetch.log and data/status.json for details."
           exit 1
