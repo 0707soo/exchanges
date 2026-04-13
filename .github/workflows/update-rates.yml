@@ -24,16 +24,60 @@ jobs:
         run: pip install requests
 
       - name: Fetch rates
-        run: python scripts/fetch_rates.py
+        id: fetch
+        run: |
+          set +e
+          python scripts/fetch_rates.py 2>&1 | tee fetch.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Write fetch status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('.')
+          data_dir = root / 'data'
+          data_dir.mkdir(parents=True, exist_ok=True)
+          latest_path = data_dir / 'latest.json'
+          status_path = data_dir / 'status.json'
+          fetch_log = (root / 'fetch.log').read_text(encoding='utf-8') if (root / 'fetch.log').exists() else ''
+          latest = json.loads(latest_path.read_text(encoding='utf-8')) if latest_path.exists() else {}
+          exit_code = int('${{ steps.fetch.outputs.exit_code || 1 }}')
+          status = {
+              'source': 'hanabank',
+              'last_attempt_at_utc': datetime.now(timezone.utc).isoformat(),
+              'last_attempt_success': exit_code == 0,
+              'last_error': None if exit_code == 0 else (fetch_log.strip().splitlines()[-1] if fetch_log.strip() else 'fetch failed'),
+              'last_log_excerpt': fetch_log.strip().splitlines()[-10:],
+              'latest_published_at_kst': latest.get('published_at_kst'),
+              'latest_captured_at_utc': latest.get('captured_at_utc'),
+              'latest_sequence': latest.get('sequence'),
+          }
+          status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
+          print(json.dumps(status, ensure_ascii=False))
+          PY
 
       - name: Commit changes
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/*.json data/history/*.ndjson || true
+          git add data/*.json data/history/*.ndjson fetch.log || true
+          git reset -- fetch.log || true
           if git diff --cached --quiet; then
             echo "No changes"
             exit 0
           fi
           git commit -m "chore: update exchange rates (auto)"
           git push
+
+      - name: Fail if fetch failed
+        if: steps.fetch.outputs.exit_code != '0'
+        run: |
+          echo "Exchange rate fetch failed. See fetch.log and data/status.json for details."
+          exit 1

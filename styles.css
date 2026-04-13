@@ -2,6 +2,8 @@
 body { margin: 0; font-family: system-ui, sans-serif; background: #0b1220; color: #e8eefc; }
 .wrap { max-width: 1000px; margin: 0 auto; padding: 20px; }
 h1 { margin: 0 0 8px; }
+.status-banner { margin: 0 0 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #6a2a2a; background: #2a1212; color: #ffd7d7; font-size: 14px; line-height: 1.5; }
+.status-banner.ok { border-color: #264b2d; background: #102016; color: #cfeeda; }
 .meta { color: #9fb0d0; margin: 0 0 16px; font-size: 14px; }
 .meta-line { margin: 2px 0; }
 .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }

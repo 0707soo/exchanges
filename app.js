@@ -1,4 +1,5 @@
 let latest;
+let fetchStatus;
 let seriesByPeriod = {};
 let chart;
 let detailsOpen = false;
@@ -18,12 +19,52 @@ const toKstShort = (iso) => new Intl.DateTimeFormat('ko-KR', {
   hour12: false,
 }).format(new Date(iso));
 
+async function loadStatus() {
+  try {
+    const r = await fetch('./data/status.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
+function renderFetchStatus() {
+  const statusLine = document.getElementById('meta-status');
+  const banner = document.getElementById('status-banner');
+  if (!statusLine || !banner) return;
+
+  if (!fetchStatus) {
+    statusLine.textContent = '수집 상태: 상태 파일 없음';
+    banner.hidden = true;
+    return;
+  }
+
+  const attempted = fetchStatus.last_attempt_at_utc ? toKst(fetchStatus.last_attempt_at_utc) : '-';
+  const success = !!fetchStatus.last_attempt_success;
+
+  if (success) {
+    statusLine.textContent = `수집 상태: 정상 (${attempted})`;
+    banner.hidden = true;
+    banner.classList.remove('ok');
+    return;
+  }
+
+  const error = fetchStatus.last_error || '원인 정보 없음';
+  statusLine.textContent = `수집 상태: 실패 (${attempted})`;
+  banner.hidden = false;
+  banner.classList.remove('ok');
+  banner.textContent = `자동 수집 실패. 마지막 시도: ${attempted}. 오류: ${error}`;
+}
+
 async function load() {
-  const [l, s] = await Promise.all([
+  const [l, s, status] = await Promise.all([
     fetch('./data/latest.json', { cache: 'no-store' }).then(r => r.json()),
     fetch('./data/series-1d.json', { cache: 'no-store' }).then(r => r.json()),
+    loadStatus(),
   ]);
   latest = l;
+  fetchStatus = status;
   seriesByPeriod['1d'] = s.series || {};
 
   const currency = document.getElementById('currency');
@@ -54,6 +95,7 @@ async function load() {
 
   document.getElementById('meta-published').textContent = `고시: ${latest.published_text || '-'} (${latest.sequence || '-'}회차)`;
   document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${toKst(latest.captured_at_utc)}`;
+  renderFetchStatus();
 
   const baseToggle = document.getElementById('base-toggle');
   baseToggle.addEventListener('click', () => {
@@ -129,4 +171,5 @@ async function ensureSeries(period) {
 load().catch(err => {
   document.getElementById('meta-published').textContent = '고시: 데이터 로드 실패';
   document.getElementById('meta-collected').textContent = '오류: ' + err.message;
+  document.getElementById('meta-status').textContent = '수집 상태: 확인 불가';
 });
