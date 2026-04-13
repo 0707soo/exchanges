@@ -3,16 +3,27 @@
 하나은행 현재환율 페이지를 기준으로 환율을 자동 수집하고, GitHub Pages에서 시각화합니다.
 
 ## 자동화
-- 수집 주기: 10분 (`3,13,23,33,43,53 * * * *`)
 - 수집 스크립트: `scripts/fetch_rates.py`
+- 메인 워크플로: `.github/workflows/rates-burst-sync.yml`
 - 최신 데이터: `data/latest.json`
+- 상태 데이터: `data/status.json`
 - 누적 데이터: `data/history/YYYY-MM.ndjson`
 - 차트 데이터: `data/series.json`
 
-## 실행
+현재 자동화는 GitHub `schedule` 대신 `workflow_dispatch` 기반의 self-dispatch 체인으로 운용합니다.
+
+- 한 번 실행되면 다음 run을 자동으로 다시 호출합니다.
+- 폴링 간격은 90초입니다.
+- 데이터 push는 약 3분 단위로 묶어서 처리합니다.
+- KST 22:00~06:00 사이에는 체인을 중지합니다.
+
+## 수동 실행
 ```bash
 python3 scripts/fetch_rates.py
 ```
 
+또는 GitHub Actions에서 `rates-burst-sync` 워크플로를 직접 실행해 체인을 시작할 수 있습니다.
+
 ## 주의
-원본 페이지 구조가 변경되면 파서 업데이트가 필요합니다.
+- 원본 페이지 구조가 변경되면 파서 업데이트가 필요합니다.
+- GitHub Actions 기반 자동화 특성상 정책, 제한, 플랫폼 동작 변화에 따라 구조를 다시 조정해야 할 수 있습니다.
