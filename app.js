@@ -42,6 +42,8 @@ function renderFetchStatus() {
 
   const attempted = fetchStatus.last_attempt_at_utc ? toKst(fetchStatus.last_attempt_at_utc) : '-';
   const success = !!fetchStatus.last_attempt_success;
+  const streak = Number(fetchStatus.failure_streak || 0);
+  const total = Number(fetchStatus.total_failures || 0);
 
   if (success) {
     statusLine.textContent = `수집 상태: 정상 (${attempted})`;
@@ -51,10 +53,10 @@ function renderFetchStatus() {
   }
 
   const error = fetchStatus.last_error || '원인 정보 없음';
-  statusLine.textContent = `수집 상태: 실패 (${attempted})`;
+  statusLine.textContent = `수집 상태: 실패 (${attempted}, 연속 ${streak}회)`;
   banner.hidden = false;
   banner.classList.remove('ok');
-  banner.textContent = `자동 수집 실패. 마지막 시도: ${attempted}. 오류: ${error}`;
+  banner.textContent = `자동 수집 실패, 마지막 시도 ${attempted}, 연속 실패 ${streak}회, 누적 실패 ${total}회, 오류: ${error}`;
 }
 
 async function load() {

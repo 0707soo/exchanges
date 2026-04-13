@@ -47,16 +47,22 @@ jobs:
           status_path = data_dir / 'status.json'
           fetch_log = (root / 'fetch.log').read_text(encoding='utf-8') if (root / 'fetch.log').exists() else ''
           latest = json.loads(latest_path.read_text(encoding='utf-8')) if latest_path.exists() else {}
+          previous = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
           exit_code = int('${{ steps.fetch.outputs.exit_code || 1 }}')
+          success = exit_code == 0
+          failure_streak = 0 if success else int(previous.get('failure_streak', 0)) + 1
+          total_failures = int(previous.get('total_failures', 0)) + (0 if success else 1)
           status = {
               'source': 'hanabank',
               'last_attempt_at_utc': datetime.now(timezone.utc).isoformat(),
-              'last_attempt_success': exit_code == 0,
-              'last_error': None if exit_code == 0 else (fetch_log.strip().splitlines()[-1] if fetch_log.strip() else 'fetch failed'),
+              'last_attempt_success': success,
+              'last_error': None if success else (fetch_log.strip().splitlines()[-1] if fetch_log.strip() else 'fetch failed'),
               'last_log_excerpt': fetch_log.strip().splitlines()[-10:],
               'latest_published_at_kst': latest.get('published_at_kst'),
               'latest_captured_at_utc': latest.get('captured_at_utc'),
               'latest_sequence': latest.get('sequence'),
+              'failure_streak': failure_streak,
+              'total_failures': total_failures,
           }
           status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
           print(json.dumps(status, ensure_ascii=False))
