@@ -66,7 +66,6 @@ jobs:
           any_success = False
           last_error = None
           attempt_logs = []
-          pending_commit = False
 
           for idx in range(attempts):
               ts = datetime.now(timezone.utc).isoformat()
@@ -105,23 +104,8 @@ jobs:
               else:
                   last_error = lines[-1] if lines else f'fetch failed with exit code {proc.returncode}'
 
-              if changed:
-                  pending_commit = True
-
               if idx < attempts - 1:
                   time.sleep(interval_seconds)
-
-          if pending_commit:
-              subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
-              subprocess.run(['git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], check=True)
-              subprocess.run('git add data/*.json data/history/*.ndjson || true', shell=True, check=True)
-              diff = subprocess.run(['git', 'diff', '--cached', '--quiet'])
-              if diff.returncode != 0:
-                  subprocess.run(['git', 'commit', '-m', 'chore: update exchange rates (auto)'], check=True)
-                  subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'], check=True)
-                  subprocess.run(['git', 'push'], check=True)
-                  pushed_count += 1
-              pending_commit = False
 
           latest = json.loads(latest_path.read_text(encoding='utf-8')) if latest_path.exists() else {}
           previous = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
@@ -165,18 +149,18 @@ jobs:
         env:
           TRIGGER_REASON: ${{ inputs.trigger_reason || 'manual' }}
 
-      - name: Commit final status
+      - name: Commit all exchange updates
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/status.json fetch.log || true
+          git pull --rebase --autostash origin main
+          git add data/*.json data/history/*.ndjson fetch.log || true
           if git diff --cached --quiet; then
-            echo "No final status changes"
+            echo "No exchange changes"
             exit 0
           fi
-          git commit -m "chore: update exchange fetch status (auto)"
-          git pull --rebase origin main
+          git commit -m "chore: update exchange data (auto)"
           git push
 
       - name: Queue next run
