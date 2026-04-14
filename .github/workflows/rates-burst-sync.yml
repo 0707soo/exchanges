@@ -117,9 +117,8 @@ jobs:
               subprocess.run('git add data/*.json data/history/*.ndjson || true', shell=True, check=True)
               diff = subprocess.run(['git', 'diff', '--cached', '--quiet'])
               if diff.returncode != 0:
-                  subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'], check=True)
-                  subprocess.run('git add data/*.json data/history/*.ndjson || true', shell=True, check=True)
                   subprocess.run(['git', 'commit', '-m', 'chore: update exchange rates (auto)'], check=True)
+                  subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'], check=True)
                   subprocess.run(['git', 'push'], check=True)
                   pushed_count += 1
               pending_commit = False
@@ -177,6 +176,7 @@ jobs:
             exit 0
           fi
           git commit -m "chore: update exchange fetch status (auto)"
+          git pull --rebase origin main
           git push
 
       - name: Queue next run
