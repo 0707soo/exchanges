@@ -62,7 +62,6 @@ jobs:
           started_at = datetime.now(timezone.utc)
           attempts = 3
           interval_seconds = 120
-          push_every_attempts = 2
           pushed_count = 0
           any_success = False
           last_error = None
@@ -109,20 +108,21 @@ jobs:
               if changed:
                   pending_commit = True
 
-              should_push_now = pending_commit and (((idx + 1) % push_every_attempts == 0) or (idx == attempts - 1))
-              if should_push_now:
-                  subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
-                  subprocess.run(['git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], check=True)
-                  subprocess.run('git add data/*.json data/history/*.ndjson || true', shell=True, check=True)
-                  diff = subprocess.run(['git', 'diff', '--cached', '--quiet'])
-                  if diff.returncode != 0:
-                      subprocess.run(['git', 'commit', '-m', 'chore: update exchange rates (auto)'], check=True)
-                      subprocess.run(['git', 'push'], check=True)
-                      pushed_count += 1
-                  pending_commit = False
-
               if idx < attempts - 1:
                   time.sleep(interval_seconds)
+
+          if pending_commit:
+              subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
+              subprocess.run(['git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], check=True)
+              subprocess.run('git add data/*.json data/history/*.ndjson || true', shell=True, check=True)
+              diff = subprocess.run(['git', 'diff', '--cached', '--quiet'])
+              if diff.returncode != 0:
+                  subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'], check=True)
+                  subprocess.run('git add data/*.json data/history/*.ndjson || true', shell=True, check=True)
+                  subprocess.run(['git', 'commit', '-m', 'chore: update exchange rates (auto)'], check=True)
+                  subprocess.run(['git', 'push'], check=True)
+                  pushed_count += 1
+              pending_commit = False
 
           latest = json.loads(latest_path.read_text(encoding='utf-8')) if latest_path.exists() else {}
           previous = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
@@ -151,7 +151,7 @@ jobs:
               'chain_allowed_now': True,
               'chain_timezone': 'Asia/Seoul',
               'chain_mode': 'daytime' if is_daytime else 'night',
-              'next_delay_seconds': 0 if is_daytime else 1200,
+              'next_delay_seconds': 120 if is_daytime else 1200,
           }
           status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
 
@@ -160,7 +160,7 @@ jobs:
               f.write(f"had_success={'true' if any_success else 'false'}\n")
               f.write(f"push_count={pushed_count}\n")
               f.write("allow_chain=true\n")
-              f.write(f"next_delay_seconds={0 if is_daytime else 1200}\n")
+              f.write(f"next_delay_seconds={120 if is_daytime else 1200}\n")
           print(json.dumps(status, ensure_ascii=False))
           PY
         env:
