@@ -135,6 +135,7 @@ jobs:
               'chain_timezone': 'Asia/Seoul',
               'chain_mode': 'daytime' if is_daytime else 'night',
               'next_delay_seconds': 120 if is_daytime else 1200,
+              'chain_driver': 'chain-keeper',
           }
           status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
 
@@ -142,7 +143,6 @@ jobs:
           with github_output.open('a', encoding='utf-8') as f:
               f.write(f"had_success={'true' if any_success else 'false'}\n")
               f.write(f"push_count={pushed_count}\n")
-              f.write("allow_chain=true\n")
               f.write(f"next_delay_seconds={120 if is_daytime else 1200}\n")
           print(json.dumps(status, ensure_ascii=False))
           PY
@@ -162,20 +162,6 @@ jobs:
           fi
           git commit -m "chore: update exchange data (auto)"
           git push
-
-      - name: Queue next run
-        if: always() && inputs.continue_chain != false && steps.poll.outputs.allow_chain == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          delay="${{ steps.poll.outputs.next_delay_seconds || '0' }}"
-          if [ "$delay" != "0" ]; then
-            sleep "$delay"
-          fi
-          gh workflow run rates-burst-sync.yml \
-            --repo 0707soo/exchanges \
-            -f continue_chain=true \
-            -f trigger_reason=auto-chain
 
       - name: Fail if all attempts failed
         if: steps.poll.outputs.had_success != 'true'

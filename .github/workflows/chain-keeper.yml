@@ -1,0 +1,130 @@
+name: chain-keeper
+
+on:
+  workflow_run:
+    workflows: ["rates-burst-sync"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: exchanges-chain-keeper
+  cancel-in-progress: true
+
+jobs:
+  restart:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Decide whether to continue chain
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          status_path = Path('data/status.json')
+          status = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
+          next_delay = int(status.get('next_delay_seconds') or 120)
+
+          runs = json.loads(subprocess.check_output([
+              'gh', 'run', 'list',
+              '--repo', '0707soo/exchanges',
+              '--workflow', 'rates-burst-sync.yml',
+              '--limit', '6',
+              '--json', 'databaseId,status,conclusion,createdAt,event'
+          ], text=True))
+
+          current_run_id = os.environ.get('TRIGGER_RUN_ID')
+          newer_active = False
+          for run in runs:
+              rid = str(run.get('databaseId'))
+              if current_run_id and rid == current_run_id:
+                  continue
+              if run.get('status') in ('queued', 'in_progress'):
+                  newer_active = True
+                  break
+
+          now = datetime.now(timezone.utc)
+          ended = status.get('window_ended_at_utc')
+          stale = True
+          if ended:
+              ended_dt = datetime.fromisoformat(ended)
+              stale = (now - ended_dt).total_seconds() > 1800
+
+          should_dispatch = not newer_active and not stale
+          reason = 'auto-chain'
+          if stale:
+              reason = 'stale-stop'
+          elif newer_active:
+              reason = 'already-active'
+
+          out = Path(os.environ['GITHUB_OUTPUT'])
+          with out.open('a', encoding='utf-8') as f:
+              f.write(f"should_dispatch={'true' if should_dispatch else 'false'}\n")
+              f.write(f"delay_seconds={next_delay}\n")
+              f.write(f"reason={reason}\n")
+          print(json.dumps({
+              'should_dispatch': should_dispatch,
+              'delay_seconds': next_delay,
+              'reason': reason,
+              'newer_active': newer_active,
+              'stale': stale,
+          }, ensure_ascii=False))
+          PY
+        env:
+          TRIGGER_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+
+      - name: Wait before restart
+        if: steps.decide.outputs.should_dispatch == 'true'
+        run: sleep "${{ steps.decide.outputs.delay_seconds }}"
+
+      - name: Recheck before dispatch
+        if: steps.decide.outputs.should_dispatch == 'true'
+        id: recheck
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          runs = json.loads(subprocess.check_output([
+              'gh', 'run', 'list',
+              '--repo', '0707soo/exchanges',
+              '--workflow', 'rates-burst-sync.yml',
+              '--limit', '6',
+              '--json', 'databaseId,status'
+          ], text=True))
+          active = any(run.get('status') in ('queued', 'in_progress') for run in runs)
+          out = Path(os.environ['GITHUB_OUTPUT'])
+          with out.open('a', encoding='utf-8') as f:
+              f.write(f"dispatch={'false' if active else 'true'}\n")
+          print(json.dumps({'active': active}, ensure_ascii=False))
+          PY
+
+      - name: Dispatch next exchange run
+        if: steps.decide.outputs.should_dispatch == 'true' && steps.recheck.outputs.dispatch == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run rates-burst-sync.yml \
+            --repo 0707soo/exchanges \
+            -f continue_chain=true \
+            -f trigger_reason=auto-chain
