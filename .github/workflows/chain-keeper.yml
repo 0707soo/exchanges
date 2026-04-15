@@ -99,9 +99,17 @@ jobs:
                       '-f', 'continue_chain=true',
                       '-f', 'trigger_reason=chain-keeper'
                   ], check=True)
+                  subprocess.run([
+                      'gh', 'workflow', 'run', 'deploy-pages.yml',
+                      '--repo', '0707soo/exchanges'
+                  ], check=True)
                   time.sleep(15)
               else:
                   print(json.dumps({'action': 'wait-active', 'delay': delay}, ensure_ascii=False))
+                  subprocess.run([
+                      'gh', 'workflow', 'run', 'deploy-pages.yml',
+                      '--repo', '0707soo/exchanges'
+                  ], check=True)
 
               sleep_for = max(30, min(delay, 300))
               time.sleep(sleep_for)
