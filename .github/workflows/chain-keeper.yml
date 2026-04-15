@@ -49,15 +49,7 @@ jobs:
               '--json', 'databaseId,status,conclusion,createdAt,event'
           ], text=True))
 
-          current_run_id = os.environ.get('TRIGGER_RUN_ID')
-          newer_active = False
-          for run in runs:
-              rid = str(run.get('databaseId'))
-              if current_run_id and rid == current_run_id:
-                  continue
-              if run.get('status') in ('queued', 'in_progress'):
-                  newer_active = True
-                  break
+          newer_active = any(run.get('status') in ('queued', 'in_progress') for run in runs)
 
           now = datetime.now(timezone.utc)
           ended = status.get('window_ended_at_utc')
@@ -86,8 +78,6 @@ jobs:
               'stale': stale,
           }, ensure_ascii=False))
           PY
-        env:
-          TRIGGER_RUN_ID: ${{ github.event.workflow_run.id || '' }}
 
       - name: Wait before restart
         if: steps.decide.outputs.should_dispatch == 'true'
