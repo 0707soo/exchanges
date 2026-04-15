@@ -2,55 +2,51 @@
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-04-15T16:37:20.410694+00:00",
-  "window_ended_at_utc": "2026-04-15T16:42:08.237944+00:00",
+  "window_started_at_utc": "2026-04-15T16:42:39.139312+00:00",
+  "window_ended_at_utc": "2026-04-15T16:46:54.572671+00:00",
   "attempt_count": 3,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-04-15T16:41:54.208614+00:00",
+  "last_attempt_at_utc": "2026-04-15T16:46:49.008065+00:00",
   "last_attempt_success": true,
   "last_error": null,
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=909"
+    "rows=58 changed=True sequence=916"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-04-15T16:37:20.410706+00:00",
+      "attempted_at_utc": "2026-04-15T16:42:39.139318+00:00",
       "exit_code": 0,
       "changed": false,
-      "sequence_before": 904,
-      "sequence_after": 904,
-      "log_excerpt": [
-        "rows=58 changed=False sequence=904"
-      ]
-    },
-    {
-      "attempted_at_utc": "2026-04-15T16:39:23.807981+00:00",
-      "exit_code": 1,
-      "changed": false,
-      "sequence_before": 904,
-      "sequence_after": 904,
-      "log_excerpt": [
-        "    html = fetch_html(now_kst)",
-        "           ^^^^^^^^^^^^^^^^^^^",
-        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
-        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-        "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
-      ]
-    },
-    {
-      "attempted_at_utc": "2026-04-15T16:41:54.208614+00:00",
-      "exit_code": 0,
-      "changed": true,
-      "sequence_before": 904,
+      "sequence_before": 909,
       "sequence_after": 909,
       "log_excerpt": [
-        "rows=58 changed=True sequence=909"
+        "rows=58 changed=False sequence=909"
+      ]
+    },
+    {
+      "attempted_at_utc": "2026-04-15T16:44:43.615809+00:00",
+      "exit_code": 0,
+      "changed": true,
+      "sequence_before": 909,
+      "sequence_after": 914,
+      "log_excerpt": [
+        "rows=58 changed=True sequence=914"
+      ]
+    },
+    {
+      "attempted_at_utc": "2026-04-15T16:46:49.008065+00:00",
+      "exit_code": 0,
+      "changed": true,
+      "sequence_before": 914,
+      "sequence_after": 916,
+      "log_excerpt": [
+        "rows=58 changed=True sequence=916"
       ]
     }
   ],
   "latest_published_at_kst": "2026-04-15T22:02:00+09:00",
-  "latest_captured_at_utc": "2026-04-15T16:41:54.327789+00:00",
-  "latest_sequence": 909,
+  "latest_captured_at_utc": "2026-04-15T16:46:49.127561+00:00",
+  "latest_sequence": 916,
   "failure_streak": 0,
   "total_failures": 0,
   "chain_allowed_now": true,
