@@ -1,11 +1,18 @@
 name: chain-keeper
 
 on:
-  workflow_run:
-    workflows: ["rates-burst-sync"]
-    types:
-      - completed
   workflow_dispatch:
+    inputs:
+      monitor_minutes:
+        description: 'How long to keep monitoring in this run'
+        required: false
+        default: '330'
+        type: string
+      stale_limit_seconds:
+        description: 'Stop if the repo status is stale beyond this many seconds'
+        required: false
+        default: '1800'
+        type: string
 
 permissions:
   actions: write
@@ -13,108 +20,91 @@ permissions:
 
 concurrency:
   group: exchanges-chain-keeper
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   restart:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion != ''
     runs-on: ubuntu-latest
+    timeout-minutes: 340
     steps:
       - name: Checkout latest main
         uses: actions/checkout@v4
         with:
           ref: main
 
-      - name: Decide whether to continue chain
-        id: decide
+      - name: Monitor and restart exchange chain
         env:
           GH_TOKEN: ${{ github.token }}
+          MONITOR_MINUTES: ${{ inputs.monitor_minutes || '330' }}
+          STALE_LIMIT_SECONDS: ${{ inputs.stale_limit_seconds || '1800' }}
         run: |
           python - <<'PY'
           import json
           import os
           import subprocess
+          import time
           from datetime import datetime, timezone
           from pathlib import Path
 
-          status_path = Path('data/status.json')
-          status = json.loads(status_path.read_text(encoding='utf-8')) if status_path.exists() else {}
-          next_delay = int(status.get('next_delay_seconds') or 120)
+          monitor_minutes = int(os.environ.get('MONITOR_MINUTES', '330'))
+          stale_limit_seconds = int(os.environ.get('STALE_LIMIT_SECONDS', '1800'))
+          deadline = time.time() + monitor_minutes * 60
 
-          runs = json.loads(subprocess.check_output([
-              'gh', 'run', 'list',
-              '--repo', '0707soo/exchanges',
-              '--workflow', 'rates-burst-sync.yml',
-              '--limit', '6',
-              '--json', 'databaseId,status,conclusion,createdAt,event'
-          ], text=True))
+          def read_status():
+              path = Path('data/status.json')
+              if not path.exists():
+                  return {}
+              return json.loads(path.read_text(encoding='utf-8'))
 
-          newer_active = any(run.get('status') in ('queued', 'in_progress') for run in runs)
+          def git_refresh():
+              subprocess.run(['git', 'fetch', 'origin', 'main'], check=True, capture_output=True, text=True)
+              subprocess.run(['git', 'checkout', '--force', 'origin/main', '--', 'data/status.json'], check=False)
 
-          now = datetime.now(timezone.utc)
-          ended = status.get('window_ended_at_utc')
-          stale = True
-          if ended:
-              ended_dt = datetime.fromisoformat(ended)
-              stale = (now - ended_dt).total_seconds() > 1800
+          def list_runs():
+              out = subprocess.check_output([
+                  'gh', 'run', 'list',
+                  '--repo', '0707soo/exchanges',
+                  '--workflow', 'rates-burst-sync.yml',
+                  '--limit', '10',
+                  '--json', 'databaseId,status,conclusion,createdAt,event'
+              ], text=True)
+              return json.loads(out)
 
-          should_dispatch = not newer_active and not stale
-          reason = 'auto-chain'
-          if stale:
-              reason = 'stale-stop'
-          elif newer_active:
-              reason = 'already-active'
+          def any_active(runs):
+              return any(run.get('status') in ('queued', 'in_progress') for run in runs)
 
-          out = Path(os.environ['GITHUB_OUTPUT'])
-          with out.open('a', encoding='utf-8') as f:
-              f.write(f"should_dispatch={'true' if should_dispatch else 'false'}\n")
-              f.write(f"delay_seconds={next_delay}\n")
-              f.write(f"reason={reason}\n")
-          print(json.dumps({
-              'should_dispatch': should_dispatch,
-              'delay_seconds': next_delay,
-              'reason': reason,
-              'newer_active': newer_active,
-              'stale': stale,
-          }, ensure_ascii=False))
+          while time.time() < deadline:
+              git_refresh()
+              status = read_status()
+              runs = list_runs()
+              active = any_active(runs)
+              now = datetime.now(timezone.utc)
+              ended = status.get('window_ended_at_utc')
+              stale = True
+              if ended:
+                  ended_dt = datetime.fromisoformat(ended)
+                  stale = (now - ended_dt).total_seconds() > stale_limit_seconds
+
+              if stale:
+                  print(json.dumps({'action': 'stop', 'reason': 'stale-status', 'status': status}, ensure_ascii=False))
+                  break
+
+              delay = int(status.get('next_delay_seconds') or 120)
+
+              if not active:
+                  print(json.dumps({'action': 'dispatch', 'delay': delay}, ensure_ascii=False))
+                  subprocess.run([
+                      'gh', 'workflow', 'run', 'rates-burst-sync.yml',
+                      '--repo', '0707soo/exchanges',
+                      '-f', 'continue_chain=true',
+                      '-f', 'trigger_reason=chain-keeper'
+                  ], check=True)
+                  time.sleep(15)
+              else:
+                  print(json.dumps({'action': 'wait-active', 'delay': delay}, ensure_ascii=False))
+
+              sleep_for = max(30, min(delay, 300))
+              time.sleep(sleep_for)
+
+          print(json.dumps({'action': 'done'}, ensure_ascii=False))
           PY
-
-      - name: Wait before restart
-        if: steps.decide.outputs.should_dispatch == 'true'
-        run: sleep "${{ steps.decide.outputs.delay_seconds }}"
-
-      - name: Recheck before dispatch
-        if: steps.decide.outputs.should_dispatch == 'true'
-        id: recheck
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          import subprocess
-          from pathlib import Path
-
-          runs = json.loads(subprocess.check_output([
-              'gh', 'run', 'list',
-              '--repo', '0707soo/exchanges',
-              '--workflow', 'rates-burst-sync.yml',
-              '--limit', '6',
-              '--json', 'databaseId,status'
-          ], text=True))
-          active = any(run.get('status') in ('queued', 'in_progress') for run in runs)
-          out = Path(os.environ['GITHUB_OUTPUT'])
-          with out.open('a', encoding='utf-8') as f:
-              f.write(f"dispatch={'false' if active else 'true'}\n")
-          print(json.dumps({'active': active}, ensure_ascii=False))
-          PY
-
-      - name: Dispatch next exchange run
-        if: steps.decide.outputs.should_dispatch == 'true' && steps.recheck.outputs.dispatch == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow run rates-burst-sync.yml \
-            --repo 0707soo/exchanges \
-            -f continue_chain=true \
-            -f trigger_reason=auto-chain
