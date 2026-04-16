@@ -1,0 +1,114 @@
+name: pages-keeper
+
+on:
+  workflow_dispatch:
+    inputs:
+      monitor_minutes:
+        description: 'How long to keep monitoring in this run'
+        required: false
+        default: '330'
+        type: string
+      deploy_interval_seconds:
+        description: 'How often to try a pages deploy while monitoring'
+        required: false
+        default: '300'
+        type: string
+      stale_limit_seconds:
+        description: 'Stop if repo status is stale beyond this many seconds'
+        required: false
+        default: '7200'
+        type: string
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: exchanges-pages-keeper
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Monitor and deploy pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MONITOR_MINUTES: ${{ inputs.monitor_minutes || '330' }}
+          DEPLOY_INTERVAL_SECONDS: ${{ inputs.deploy_interval_seconds || '300' }}
+          STALE_LIMIT_SECONDS: ${{ inputs.stale_limit_seconds || '7200' }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          import time
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          monitor_minutes = int(os.environ.get('MONITOR_MINUTES', '330'))
+          deploy_interval_seconds = int(os.environ.get('DEPLOY_INTERVAL_SECONDS', '300'))
+          stale_limit_seconds = int(os.environ.get('STALE_LIMIT_SECONDS', '7200'))
+          deadline = time.time() + monitor_minutes * 60
+          last_deploy_at = 0.0
+
+          def git_refresh():
+              subprocess.run(['git', 'fetch', 'origin', 'main'], check=True, capture_output=True, text=True)
+              subprocess.run(['git', 'checkout', '--force', 'origin/main', '--', 'data/status.json', 'data/latest.json'], check=False)
+
+          def read_json(path_str):
+              path = Path(path_str)
+              if not path.exists():
+                  return {}
+              return json.loads(path.read_text(encoding='utf-8'))
+
+          def list_deploy_runs():
+              out = subprocess.check_output([
+                  'gh', 'run', 'list',
+                  '--repo', '0707soo/exchanges',
+                  '--workflow', 'deploy-pages.yml',
+                  '--limit', '8',
+                  '--json', 'databaseId,status,conclusion,createdAt'
+              ], text=True)
+              return json.loads(out)
+
+          while time.time() < deadline:
+              git_refresh()
+              status = read_json('data/status.json')
+              latest = read_json('data/latest.json')
+              now = datetime.now(timezone.utc)
+              ended = status.get('window_ended_at_utc')
+              stale = True
+              if ended:
+                  ended_dt = datetime.fromisoformat(ended)
+                  stale = (now - ended_dt).total_seconds() > stale_limit_seconds
+
+              deploy_runs = list_deploy_runs()
+              deploy_active = any(run.get('status') in ('queued', 'in_progress') for run in deploy_runs)
+
+              should_deploy = (not deploy_active) and ((time.time() - last_deploy_at) >= deploy_interval_seconds)
+              if stale:
+                  print(json.dumps({'action': 'stop', 'reason': 'stale-status', 'status': status, 'latest': latest}, ensure_ascii=False))
+                  break
+
+              if should_deploy:
+                  print(json.dumps({'action': 'deploy', 'latest_published_at_kst': latest.get('published_at_kst')}, ensure_ascii=False))
+                  subprocess.run([
+                      'gh', 'workflow', 'run', 'deploy-pages.yml',
+                      '--repo', '0707soo/exchanges'
+                  ], check=True)
+                  last_deploy_at = time.time()
+                  time.sleep(15)
+              else:
+                  print(json.dumps({'action': 'wait', 'deploy_active': deploy_active}, ensure_ascii=False))
+
+              time.sleep(60)
+
+          print(json.dumps({'action': 'done'}, ensure_ascii=False))
+          PY

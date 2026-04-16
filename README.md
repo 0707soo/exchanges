@@ -10,14 +10,15 @@
 - 누적 데이터: `data/history/YYYY-MM.ndjson`
 - 차트 데이터: `data/series.json`
 
-현재 자동화는 GitHub `schedule` 대신 두 개의 `workflow_dispatch` 기반 워크플로로 운용합니다.
+현재 자동화는 GitHub `schedule` 대신 세 개의 `workflow_dispatch` 기반 워크플로로 운용합니다.
 
 - `rates-burst-sync`는 수집과 데이터 커밋만 담당합니다.
-- `chain-keeper`는 장기 실행으로 상태를 감시하고, 필요할 때 `rates-burst-sync`를 다시 호출합니다.
+- `chain-keeper`는 장기 실행으로 수집 상태를 감시하고, 필요할 때 `rates-burst-sync`를 다시 호출합니다.
+- `pages-keeper`는 장기 실행으로 Pages 배포를 감시하고, `deploy-pages`를 주기적으로 호출합니다.
 - 주간 폴링 간격은 120초입니다.
 - 데이터 push는 수집 워크플로에서만 수행합니다.
 - KST 22:00~06:00 사이에는 다음 run까지의 대기 시간을 길게 둡니다.
-- Pages 배포는 `deploy-pages` 워크플로가 최신 `main` 기준으로 별도 처리합니다.
+- Pages 배포는 `deploy-pages` 워크플로가 최신 `main` 기준으로 처리합니다.
 
 ## 수동 실행
 ```bash
