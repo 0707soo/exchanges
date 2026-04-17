@@ -93,12 +93,13 @@ jobs:
               deploy_active = any(run.get('status') in ('queued', 'in_progress') for run in deploy_runs)
 
               should_deploy = (not deploy_active) and ((time.time() - last_deploy_at) >= deploy_interval_seconds)
-              if stale:
-                  print(json.dumps({'action': 'stop', 'reason': 'stale-status', 'status': status, 'latest': latest}, ensure_ascii=False))
-                  break
 
               if should_deploy:
-                  print(json.dumps({'action': 'deploy', 'latest_published_at_kst': latest.get('published_at_kst')}, ensure_ascii=False))
+                  print(json.dumps({
+                      'action': 'deploy',
+                      'reason': 'stale-status' if stale else 'interval',
+                      'latest_published_at_kst': latest.get('published_at_kst')
+                  }, ensure_ascii=False))
                   subprocess.run([
                       'gh', 'workflow', 'run', 'deploy-pages.yml',
                       '--repo', '0707soo/exchanges'
@@ -106,7 +107,11 @@ jobs:
                   last_deploy_at = time.time()
                   time.sleep(15)
               else:
-                  print(json.dumps({'action': 'wait', 'deploy_active': deploy_active}, ensure_ascii=False))
+                  print(json.dumps({
+                      'action': 'wait',
+                      'reason': 'stale-but-deploy-active' if stale and deploy_active else ('stale-wait' if stale else 'healthy'),
+                      'deploy_active': deploy_active
+                  }, ensure_ascii=False))
 
               time.sleep(60)
 

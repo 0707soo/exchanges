@@ -85,14 +85,16 @@ jobs:
                   ended_dt = datetime.fromisoformat(ended)
                   stale = (now - ended_dt).total_seconds() > stale_limit_seconds
 
-              if stale:
-                  print(json.dumps({'action': 'stop', 'reason': 'stale-status', 'status': status}, ensure_ascii=False))
-                  break
-
               delay = int(status.get('next_delay_seconds') or 120)
+              should_dispatch = stale or not active
 
-              if not active:
-                  print(json.dumps({'action': 'dispatch', 'delay': delay}, ensure_ascii=False))
+              if should_dispatch and not active:
+                  print(json.dumps({
+                      'action': 'dispatch',
+                      'reason': 'stale-status' if stale else 'no-active-run',
+                      'delay': delay,
+                      'status': status,
+                  }, ensure_ascii=False))
                   subprocess.run([
                       'gh', 'workflow', 'run', 'rates-burst-sync.yml',
                       '--repo', '0707soo/exchanges',
@@ -101,9 +103,13 @@ jobs:
                   ], check=True)
                   time.sleep(15)
               else:
-                  print(json.dumps({'action': 'wait-active', 'delay': delay}, ensure_ascii=False))
+                  print(json.dumps({
+                      'action': 'wait-active' if active else 'wait',
+                      'reason': 'stale-but-run-active' if stale and active else 'healthy',
+                      'delay': delay,
+                  }, ensure_ascii=False))
 
-              sleep_for = max(30, min(delay, 300))
+              sleep_for = 30 if stale else max(30, min(delay, 300))
               time.sleep(sleep_for)
 
           print(json.dumps({'action': 'done'}, ensure_ascii=False))
