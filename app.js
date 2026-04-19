@@ -19,6 +19,12 @@ const toKstShort = (iso) => new Intl.DateTimeFormat('ko-KR', {
   hour12: false,
 }).format(new Date(iso));
 
+function formatDetectedTime() {
+  if (latest?.viewed_text) return latest.viewed_text;
+  if (latest?.captured_at_utc) return `${toKst(latest.captured_at_utc)} (KST, UTC+9)`;
+  return '-';
+}
+
 async function loadStatus() {
   try {
     const r = await fetch('./data/status.json', { cache: 'no-store' });
@@ -97,6 +103,7 @@ async function load() {
 
   document.getElementById('meta-published').textContent = `고시: ${latest.published_text || '-'} (${latest.sequence || '-'}회차)`;
   document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${toKst(latest.captured_at_utc)}`;
+  document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
   renderFetchStatus();
 
   const baseToggle = document.getElementById('base-toggle');
@@ -173,5 +180,6 @@ async function ensureSeries(period) {
 load().catch(err => {
   document.getElementById('meta-published').textContent = '고시: 데이터 로드 실패';
   document.getElementById('meta-collected').textContent = '오류: ' + err.message;
+  document.getElementById('meta-detected').textContent = '최종 감지: 확인 불가';
   document.getElementById('meta-status').textContent = '수집 상태: 확인 불가';
 });
