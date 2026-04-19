@@ -18,6 +18,11 @@ on:
         required: false
         default: '7200'
         type: string
+      continue_keeper:
+        description: 'Redispatch this keeper before it exits'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   actions: write
@@ -43,6 +48,7 @@ jobs:
           MONITOR_MINUTES: ${{ inputs.monitor_minutes || '330' }}
           DEPLOY_INTERVAL_SECONDS: ${{ inputs.deploy_interval_seconds || '300' }}
           STALE_LIMIT_SECONDS: ${{ inputs.stale_limit_seconds || '7200' }}
+          CONTINUE_KEEPER: ${{ inputs.continue_keeper != false }}
         run: |
           python - <<'PY'
           import json
@@ -55,6 +61,7 @@ jobs:
           monitor_minutes = int(os.environ.get('MONITOR_MINUTES', '330'))
           deploy_interval_seconds = int(os.environ.get('DEPLOY_INTERVAL_SECONDS', '300'))
           stale_limit_seconds = int(os.environ.get('STALE_LIMIT_SECONDS', '7200'))
+          continue_keeper = os.environ.get('CONTINUE_KEEPER', 'true').lower() == 'true'
           deadline = time.time() + monitor_minutes * 60
           last_deploy_at = 0.0
 
@@ -114,6 +121,17 @@ jobs:
                   }, ensure_ascii=False))
 
               time.sleep(60)
+
+          if continue_keeper:
+              print(json.dumps({'action': 'redispatch-self'}, ensure_ascii=False))
+              subprocess.run([
+                  'gh', 'workflow', 'run', 'pages-keeper.yml',
+                  '--repo', '0707soo/exchanges',
+                  '-f', f'monitor_minutes={monitor_minutes}',
+                  '-f', f'deploy_interval_seconds={deploy_interval_seconds}',
+                  '-f', f'stale_limit_seconds={stale_limit_seconds}',
+                  '-f', 'continue_keeper=true'
+              ], check=True)
 
           print(json.dumps({'action': 'done'}, ensure_ascii=False))
           PY

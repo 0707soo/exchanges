@@ -13,8 +13,8 @@
 현재 자동화는 GitHub `schedule` 대신 세 개의 `workflow_dispatch` 기반 워크플로로 운용합니다.
 
 - `rates-burst-sync`는 수집과 데이터 커밋만 담당합니다.
-- `chain-keeper`는 장기 실행으로 수집 상태를 감시하고, active run이 없거나 상태가 stale이면 `rates-burst-sync`를 다시 호출합니다.
-- `pages-keeper`는 장기 실행으로 Pages 배포를 감시하고, 상태가 stale해도 종료하지 않고 `deploy-pages`를 주기적으로 호출합니다.
+- `chain-keeper`는 장기 실행으로 수집 상태를 감시하고, active run이 없거나 상태가 stale이면 `rates-burst-sync`를 다시 호출합니다. 실행 종료 직전에는 자기 자신을 다시 dispatch해 감시를 이어갑니다.
+- `pages-keeper`는 장기 실행으로 Pages 배포를 감시하고, 상태가 stale해도 종료하지 않고 `deploy-pages`를 주기적으로 호출합니다. 이 keeper도 종료 직전 자기 자신을 다시 dispatch합니다.
 - 주간 폴링 간격은 120초입니다.
 - 데이터 push는 수집 워크플로에서만 수행합니다.
 - KST 22:00~06:00 사이에는 다음 run까지의 대기 시간을 길게 둡니다.

@@ -13,6 +13,11 @@ on:
         required: false
         default: '1800'
         type: string
+      continue_keeper:
+        description: 'Redispatch this keeper before it exits'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   actions: write
@@ -37,6 +42,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           MONITOR_MINUTES: ${{ inputs.monitor_minutes || '330' }}
           STALE_LIMIT_SECONDS: ${{ inputs.stale_limit_seconds || '1800' }}
+          CONTINUE_KEEPER: ${{ inputs.continue_keeper != false }}
         run: |
           python - <<'PY'
           import json
@@ -48,6 +54,7 @@ jobs:
 
           monitor_minutes = int(os.environ.get('MONITOR_MINUTES', '330'))
           stale_limit_seconds = int(os.environ.get('STALE_LIMIT_SECONDS', '1800'))
+          continue_keeper = os.environ.get('CONTINUE_KEEPER', 'true').lower() == 'true'
           deadline = time.time() + monitor_minutes * 60
 
           def read_status():
@@ -111,6 +118,16 @@ jobs:
 
               sleep_for = 30 if stale else max(30, min(delay, 300))
               time.sleep(sleep_for)
+
+          if continue_keeper:
+              print(json.dumps({'action': 'redispatch-self'}, ensure_ascii=False))
+              subprocess.run([
+                  'gh', 'workflow', 'run', 'chain-keeper.yml',
+                  '--repo', '0707soo/exchanges',
+                  '-f', f'monitor_minutes={monitor_minutes}',
+                  '-f', f'stale_limit_seconds={stale_limit_seconds}',
+                  '-f', 'continue_keeper=true'
+              ], check=True)
 
           print(json.dumps({'action': 'done'}, ensure_ascii=False))
           PY
