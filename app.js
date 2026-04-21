@@ -1,5 +1,6 @@
 let latest;
 let fetchStatus;
+let recentSnapshots = [];
 let seriesByPeriod = {};
 let chart;
 let detailsOpen = false;
@@ -23,6 +24,72 @@ function formatDetectedTime() {
   if (latest?.viewed_text) return latest.viewed_text;
   if (latest?.captured_at_utc) return `${toKst(latest.captured_at_utc)} (KST, UTC+9)`;
   return '-';
+}
+
+function getHistoryMonthCandidates() {
+  const base = latest?.captured_at_utc ? new Date(latest.captured_at_utc) : new Date();
+  const current = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit'
+  }).format(base).slice(0, 7);
+  const prevDate = new Date(base);
+  prevDate.setUTCDate(1);
+  prevDate.setUTCMonth(prevDate.getUTCMonth() - 1);
+  const previous = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit'
+  }).format(prevDate).slice(0, 7);
+  return [...new Set([current, previous])];
+}
+
+async function loadRecentSnapshots() {
+  for (const month of getHistoryMonthCandidates()) {
+    try {
+      const r = await fetch(`./data/history/${month}.ndjson`, { cache: 'no-store' });
+      if (!r.ok) continue;
+      const text = await r.text();
+      const rows = text.split('\n').map(line => line.trim()).filter(Boolean).map(line => JSON.parse(line));
+      if (rows.length) return rows;
+    } catch {
+      // ignore and try next candidate
+    }
+  }
+  return [];
+}
+
+function renderRecentUpdates(code) {
+  const body = document.getElementById('recent-updates-body');
+  const caption = document.getElementById('recent-updates-caption');
+  if (!body || !caption) return;
+
+  if (!recentSnapshots.length || !latest?.rows?.[code]) {
+    caption.textContent = '표시할 이력이 없습니다';
+    body.innerHTML = '<tr><td colspan="4">최근 변동 이력이 없습니다.</td></tr>';
+    return;
+  }
+
+  const items = recentSnapshots
+    .filter((snap) => snap?.rows?.[code])
+    .slice(-8)
+    .reverse();
+
+  caption.textContent = `${code} 기준 최근 ${items.length}건`;
+
+  body.innerHTML = items.map((snap, idx) => {
+    const older = items[idx + 1];
+    const currentRate = Number(snap.rows[code].base_rate);
+    const prevRate = older?.rows?.[code] ? Number(older.rows[code].base_rate) : null;
+    const diff = prevRate == null ? null : currentRate - prevRate;
+    const diffText = diff == null ? '-' : `${diff > 0 ? '+' : ''}${fmt(diff)}`;
+    const diffClass = diff == null ? 'diff-neutral' : diff > 0 ? 'diff-up' : diff < 0 ? 'diff-down' : 'diff-neutral';
+    const published = snap.published_text || (snap.published_at_kst ? toKst(snap.published_at_kst) : '-');
+    return `
+      <tr>
+        <td>${published}</td>
+        <td>${snap.sequence || '-'}</td>
+        <td>${fmt(currentRate)}</td>
+        <td class="${diffClass}">${diffText}</td>
+      </tr>
+    `;
+  }).join('');
 }
 
 async function loadStatus() {
@@ -73,6 +140,7 @@ async function load() {
   ]);
   latest = l;
   fetchStatus = status;
+  recentSnapshots = await loadRecentSnapshots();
   seriesByPeriod['1d'] = s.series || {};
 
   const currency = document.getElementById('currency');
@@ -128,6 +196,8 @@ function syncCardsVisibility() {
 function render(code) {
   const row = latest.rows[code];
   if (!row) return;
+
+  renderRecentUpdates(code);
 
   document.getElementById('base').textContent = fmt(row.base_rate);
   document.getElementById('send').textContent = fmt(row.send);

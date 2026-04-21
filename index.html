@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260410-2" />
+    <link rel="stylesheet" href="styles.css?v=20260421-1" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -48,7 +48,29 @@
       <section class="chart">
         <canvas id="chart"></canvas>
       </section>
+
+      <section class="recent-updates">
+        <div class="section-title-row">
+          <h2>최근 변동</h2>
+          <span id="recent-updates-caption">로딩 중...</span>
+        </div>
+        <div class="recent-table-wrap">
+          <table class="recent-table">
+            <thead>
+              <tr>
+                <th>고시</th>
+                <th>회차</th>
+                <th>기준율</th>
+                <th>직전 대비</th>
+              </tr>
+            </thead>
+            <tbody id="recent-updates-body">
+              <tr><td colspan="4">로딩 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
-    <script src="app.js?v=20260413-1"></script>
+    <script src="app.js?v=20260421-1"></script>
   </body>
 </html>
