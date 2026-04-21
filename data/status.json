@@ -2,51 +2,55 @@
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-04-21T19:19:27.354725+00:00",
-  "window_ended_at_utc": "2026-04-21T19:23:46.561551+00:00",
+  "window_started_at_utc": "2026-04-21T19:24:39.884884+00:00",
+  "window_ended_at_utc": "2026-04-21T19:29:31.774259+00:00",
   "attempt_count": 3,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-04-21T19:23:41.463866+00:00",
+  "last_attempt_at_utc": "2026-04-21T19:29:22.234600+00:00",
   "last_attempt_success": true,
   "last_error": null,
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=1127"
+    "rows=58 changed=True sequence=1142"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-04-21T19:19:27.354736+00:00",
+      "attempted_at_utc": "2026-04-21T19:24:39.884896+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 1104,
-      "sequence_after": 1117,
+      "sequence_before": 1127,
+      "sequence_after": 1131,
       "log_excerpt": [
-        "rows=58 changed=True sequence=1117"
+        "rows=58 changed=True sequence=1131"
       ]
     },
     {
-      "attempted_at_utc": "2026-04-21T19:21:35.745355+00:00",
-      "exit_code": 0,
-      "changed": true,
-      "sequence_before": 1117,
-      "sequence_after": 1122,
+      "attempted_at_utc": "2026-04-21T19:26:51.113555+00:00",
+      "exit_code": 1,
+      "changed": false,
+      "sequence_before": 1131,
+      "sequence_after": 1131,
       "log_excerpt": [
-        "rows=58 changed=True sequence=1122"
+        "    html = fetch_html(now_kst)",
+        "           ^^^^^^^^^^^^^^^^^^^",
+        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
+        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
+        "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
       ]
     },
     {
-      "attempted_at_utc": "2026-04-21T19:23:41.463866+00:00",
+      "attempted_at_utc": "2026-04-21T19:29:22.234600+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 1122,
-      "sequence_after": 1127,
+      "sequence_before": 1131,
+      "sequence_after": 1142,
       "log_excerpt": [
-        "rows=58 changed=True sequence=1127"
+        "rows=58 changed=True sequence=1142"
       ]
     }
   ],
   "latest_published_at_kst": "2026-04-21T22:09:00+09:00",
-  "latest_captured_at_utc": "2026-04-21T19:23:41.583966+00:00",
-  "latest_sequence": 1127,
+  "latest_captured_at_utc": "2026-04-21T19:29:22.359341+00:00",
+  "latest_sequence": 1142,
   "failure_streak": 0,
   "total_failures": 0,
   "chain_allowed_now": true,
