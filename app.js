@@ -19,9 +19,15 @@ const toKstShort = (iso) => new Intl.DateTimeFormat('ko-KR', {
   hour: '2-digit', minute: '2-digit',
   hour12: false,
 }).format(new Date(iso));
+const normalizeDateTimeText = (text) => {
+  if (!text) return '-';
+  const m = String(text).match(/(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{2})시\s*(\d{2})분\s*(\d{2})초/);
+  if (!m) return text;
+  return `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]}:${m[6]}`;
+};
 
 function formatDetectedTime() {
-  if (latest?.viewed_text) return latest.viewed_text;
+  if (latest?.viewed_text) return normalizeDateTimeText(latest.viewed_text);
   if (latest?.captured_at_utc) return `${toKst(latest.captured_at_utc)} (KST, UTC+9)`;
   return '-';
 }
@@ -80,7 +86,9 @@ function renderRecentUpdates(code) {
     const diff = baseline == null ? null : currentRate - baseline;
     const diffText = diff == null ? '-' : `${diff > 0 ? '+' : ''}${fmt(diff)}`;
     const diffClass = diff == null ? 'diff-neutral' : diff > 0 ? 'diff-up' : diff < 0 ? 'diff-down' : 'diff-neutral';
-    const published = snap.published_text || (snap.published_at_kst ? toKst(snap.published_at_kst) : '-');
+    const published = snap.published_text
+      ? normalizeDateTimeText(snap.published_text)
+      : (snap.published_at_kst ? toKst(snap.published_at_kst) : '-');
     return `
       <tr>
         <td>${published}</td>
@@ -169,7 +177,7 @@ async function load() {
     });
   });
 
-  document.getElementById('meta-published').textContent = `고시: ${latest.published_text || '-'} (${latest.sequence || '-'}회차)`;
+  document.getElementById('meta-published').textContent = `고시: ${normalizeDateTimeText(latest.published_text) || '-'} (${latest.sequence || '-'}회차)`;
   document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${toKst(latest.captured_at_utc)}`;
   document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
   renderFetchStatus();
