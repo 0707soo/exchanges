@@ -2,55 +2,51 @@
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-04-22T19:55:52.426049+00:00",
-  "window_ended_at_utc": "2026-04-22T20:00:46.585996+00:00",
+  "window_started_at_utc": "2026-04-22T20:06:15.508430+00:00",
+  "window_ended_at_utc": "2026-04-22T20:10:53.376373+00:00",
   "attempt_count": 3,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-04-22T20:00:40.213612+00:00",
+  "last_attempt_at_utc": "2026-04-22T20:10:40.295827+00:00",
   "last_attempt_success": true,
   "last_error": null,
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=1205"
+    "rows=58 changed=True sequence=1217"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-04-22T19:55:52.426055+00:00",
-      "exit_code": 1,
-      "changed": false,
-      "sequence_before": 1196,
-      "sequence_after": 1196,
+      "attempted_at_utc": "2026-04-22T20:06:15.508437+00:00",
+      "exit_code": 0,
+      "changed": true,
+      "sequence_before": 1205,
+      "sequence_after": 1213,
       "log_excerpt": [
-        "    html = fetch_html(now_kst)",
-        "           ^^^^^^^^^^^^^^^^^^^",
-        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
-        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-        "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+        "rows=58 changed=True sequence=1213"
       ]
     },
     {
-      "attempted_at_utc": "2026-04-22T19:58:25.055901+00:00",
+      "attempted_at_utc": "2026-04-22T20:08:23.329433+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 1196,
-      "sequence_after": 1204,
+      "sequence_before": 1213,
+      "sequence_after": 1216,
       "log_excerpt": [
-        "rows=58 changed=True sequence=1204"
+        "rows=58 changed=True sequence=1216"
       ]
     },
     {
-      "attempted_at_utc": "2026-04-22T20:00:40.213612+00:00",
+      "attempted_at_utc": "2026-04-22T20:10:40.295827+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 1204,
-      "sequence_after": 1205,
+      "sequence_before": 1216,
+      "sequence_after": 1217,
       "log_excerpt": [
-        "rows=58 changed=True sequence=1205"
+        "rows=58 changed=True sequence=1217"
       ]
     }
   ],
   "latest_published_at_kst": "2026-04-22T22:09:00+09:00",
-  "latest_captured_at_utc": "2026-04-22T20:00:40.329734+00:00",
-  "latest_sequence": 1205,
+  "latest_captured_at_utc": "2026-04-22T20:10:40.414265+00:00",
+  "latest_sequence": 1217,
   "failure_streak": 0,
   "total_failures": 0,
   "chain_allowed_now": true,
