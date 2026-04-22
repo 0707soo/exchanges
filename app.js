@@ -73,11 +73,11 @@ function renderRecentUpdates(code) {
 
   caption.textContent = `${code} 기준 최근 ${items.length}건`;
 
-  body.innerHTML = items.map((snap, idx) => {
-    const older = items[idx + 1];
+  const baseline = items.length ? Number(items[items.length - 1].rows[code].base_rate) : null;
+
+  body.innerHTML = items.map((snap) => {
     const currentRate = Number(snap.rows[code].base_rate);
-    const prevRate = older?.rows?.[code] ? Number(older.rows[code].base_rate) : null;
-    const diff = prevRate == null ? null : currentRate - prevRate;
+    const diff = baseline == null ? null : currentRate - baseline;
     const diffText = diff == null ? '-' : `${diff > 0 ? '+' : ''}${fmt(diff)}`;
     const diffClass = diff == null ? 'diff-neutral' : diff > 0 ? 'diff-up' : diff < 0 ? 'diff-down' : 'diff-neutral';
     const published = snap.published_text || (snap.published_at_kst ? toKst(snap.published_at_kst) : '-');
