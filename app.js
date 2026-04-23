@@ -14,6 +14,17 @@ const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
   hour: '2-digit', minute: '2-digit', second: '2-digit',
   hour12: false,
 }).format(new Date(iso));
+const formatKstDateTime = (iso) => {
+  if (!iso) return '-';
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date(iso));
+  const get = (type) => parts.find((p) => p.type === type)?.value;
+  return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}:${get('second')}`;
+};
 const toKstShort = (iso) => new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul',
   month: '2-digit', day: '2-digit',
@@ -53,7 +64,7 @@ function filterPoints(points, period) {
 
 function formatDetectedTime() {
   if (latest?.viewed_text) return normalizeDateTimeText(latest.viewed_text);
-  if (latest?.captured_at_utc) return `${toKst(latest.captured_at_utc)} (KST, UTC+9)`;
+  if (latest?.captured_at_utc) return formatKstDateTime(latest.captured_at_utc);
   return '-';
 }
 
@@ -146,7 +157,7 @@ function renderFetchStatus() {
     return;
   }
 
-  const attempted = fetchStatus.last_attempt_at_utc ? toKst(fetchStatus.last_attempt_at_utc) : '-';
+  const attempted = fetchStatus.last_attempt_at_utc ? formatKstDateTime(fetchStatus.last_attempt_at_utc) : '-';
   const success = !!fetchStatus.last_attempt_success;
   const streak = Number(fetchStatus.failure_streak || 0);
   const total = Number(fetchStatus.total_failures || 0);
@@ -214,7 +225,7 @@ async function load() {
   });
 
   document.getElementById('meta-published').textContent = `고시: ${normalizeDateTimeText(latest.published_text) || '-'} (${latest.sequence || '-'}회차)`;
-  document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${toKst(latest.captured_at_utc)}`;
+  document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${formatKstDateTime(latest.captured_at_utc)}`;
   document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
   renderFetchStatus();
 
