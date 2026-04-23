@@ -5,6 +5,7 @@ let seriesByPeriod = {};
 let chart;
 let detailsOpen = false;
 let currentPeriod = '1d';
+let currentEndDate = null;
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
@@ -25,6 +26,30 @@ const normalizeDateTimeText = (text) => {
   if (!m) return text;
   return `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]}:${m[6]}`;
 };
+const toDateInputValue = (iso) => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date(iso));
+  const get = (type) => parts.find((p) => p.type === type)?.value;
+  return `${get('year')}-${get('month')}-${get('day')}`;
+};
+function getRangeWindow(period) {
+  const endDate = currentEndDate || toDateInputValue(latest?.captured_at_utc || new Date().toISOString());
+  const start = new Date(`${endDate}T00:00:00+09:00`);
+  const end = new Date(`${endDate}T23:59:59+09:00`);
+  if (period === '1d') return { start, end };
+  const days = period === '7d' ? 7 : 30;
+  const windowStart = new Date(start);
+  windowStart.setDate(windowStart.getDate() - (days - 1));
+  return { start: windowStart, end };
+}
+function filterPoints(points, period) {
+  const { start, end } = getRangeWindow(period);
+  return points.filter((point) => {
+    const dt = new Date(point.t);
+    return dt >= start && dt <= end;
+  });
+}
 
 function formatDetectedTime() {
   if (latest?.viewed_text) return normalizeDateTimeText(latest.viewed_text);
@@ -143,13 +168,16 @@ function renderFetchStatus() {
 async function load() {
   const [l, s, status] = await Promise.all([
     fetch('./data/latest.json', { cache: 'no-store' }).then(r => r.json()),
-    fetch('./data/series-1d.json', { cache: 'no-store' }).then(r => r.json()),
+    fetch('./data/series-30d.json', { cache: 'no-store' }).then(r => r.json()),
     loadStatus(),
   ]);
   latest = l;
   fetchStatus = status;
   recentSnapshots = await loadRecentSnapshots();
   seriesByPeriod['1d'] = s.series || {};
+  seriesByPeriod['7d'] = s.series || {};
+  seriesByPeriod['30d'] = s.series || {};
+  currentEndDate = toDateInputValue(latest.captured_at_utc);
 
   const currency = document.getElementById('currency');
   const codes = Object.keys(latest.rows).sort();
@@ -175,6 +203,14 @@ async function load() {
       document.querySelectorAll('#periods [data-period]').forEach(b => b.classList.toggle('active', b.dataset.period === period));
       render(currency.value);
     });
+  });
+
+  const rangeEndInput = document.getElementById('range-end-date');
+  rangeEndInput.value = currentEndDate;
+  rangeEndInput.max = toDateInputValue(latest.captured_at_utc);
+  rangeEndInput.addEventListener('change', () => {
+    currentEndDate = rangeEndInput.value || toDateInputValue(latest.captured_at_utc);
+    render(currency.value);
   });
 
   document.getElementById('meta-published').textContent = `고시: ${normalizeDateTimeText(latest.published_text) || '-'} (${latest.sequence || '-'}회차)`;
@@ -212,7 +248,7 @@ function render(code) {
   document.getElementById('receive').textContent = fmt(row.receive);
 
   const series = seriesByPeriod[currentPeriod] || {};
-  const points = series[code] || [];
+  const points = filterPoints(series[code] || [], currentPeriod);
   const labels = points.map(p => toKstShort(p.t));
   const values = points.map(p => p.v);
 
@@ -246,12 +282,7 @@ function render(code) {
 
 async function ensureSeries(period) {
   if (seriesByPeriod[period]) return;
-  const map = {
-    '7d': './data/series-7d.json',
-    '30d': './data/series-30d.json',
-  };
-  const path = map[period] || './data/series-1d.json';
-  const data = await fetch(path, { cache: 'no-store' }).then(r => r.json());
+  const data = await fetch('./data/series-30d.json', { cache: 'no-store' }).then(r => r.json());
   seriesByPeriod[period] = data.series || {};
 }
 

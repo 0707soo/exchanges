@@ -260,16 +260,9 @@ def rebuild_series():
         json.dumps({"series": series}, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    now_kst = datetime.now(KST)
-    today_start = now_kst.replace(hour=0, minute=0, second=0, microsecond=0)
-    series_1d = {
-        k: [point for point in values if datetime.fromisoformat(point["t"]).astimezone(KST) >= today_start]
-        for k, values in series.items()
-    }
-
     # 기간별 경량 파일
     (DATA_DIR / "series-1d.json").write_text(
-        json.dumps({"series": series_1d}, ensure_ascii=False, indent=2),
+        json.dumps({"series": {k: v[-144:] for k, v in series.items()}}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     (DATA_DIR / "series-7d.json").write_text(
