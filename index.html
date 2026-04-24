@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260424-17" />
+    <link rel="stylesheet" href="styles.css?v=20260424-18" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -12,7 +12,7 @@
       <h1>Exchange Tracker</h1>
       <div class="status-banner" id="status-banner" hidden></div>
 
-      <section class="dashboard">
+      <section class="dashboard" id="dashboard">
         <div class="dashboard-sidebar">
           <button class="panel panel-meta meta-toggle" id="meta-toggle" aria-expanded="false" aria-controls="meta-details" type="button">
             <div class="meta-compact" id="meta-compact">로딩 중...</div>
@@ -81,7 +81,7 @@
         </section>
       </section>
 
-      <section class="recent-updates panel">
+      <section class="recent-updates panel" id="recent-updates-section">
         <div class="section-title-row">
           <h2>최근 변동</h2>
           <span id="recent-updates-caption">로딩 중...</span>
@@ -103,6 +103,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260424-17"></script>
+    <script src="app.js?v=20260424-18"></script>
   </body>
 </html>

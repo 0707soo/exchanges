@@ -11,9 +11,9 @@ let filteredCodes = [];
 let activePointIndex = null;
 const urlParams = new URLSearchParams(window.location.search);
 const compareBetaEnabled = urlParams.get('beta') === 'compare';
-let compareCodes = ['USD', 'JPY', 'CNY'];
+let compareCodes = ['USD', 'CNY', 'JPY', 'GBP', 'EUR'];
 const FIXED_FAVORITE_CODES = ['USD', 'JPY', 'CNY'];
-const COMPARE_COLORS = ['#67b7ff', '#ff8f8f', '#7ee0a1'];
+const COMPARE_COLORS = ['#67b7ff', '#ff8f8f', '#7ee0a1', '#f5c26b', '#d29bff'];
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
@@ -129,7 +129,7 @@ function toggleCompareCode(code) {
     if (compareCodes.length === 1) return;
     compareCodes = compareCodes.filter((item) => item !== code);
   } else {
-    if (compareCodes.length >= 3) return;
+    if (compareCodes.length >= 5) return;
     compareCodes = [...compareCodes, code];
   }
 }
@@ -348,6 +348,7 @@ async function load() {
   ]);
   latest = l;
   fetchStatus = status;
+  if (compareBetaEnabled) document.body.classList.add('compare-mode');
   recentSnapshots = await loadRecentSnapshots();
   seriesByPeriod['1d'] = s.series || {};
   seriesByPeriod['7d'] = s.series || {};
@@ -358,6 +359,8 @@ async function load() {
 
   const currency = document.getElementById('currency');
   const codes = Object.keys(latest.rows).sort();
+  compareCodes = compareCodes.filter((code) => codes.includes(code));
+  if (!compareCodes.length) compareCodes = codes.slice(0, 5);
   applyCurrencyFilter(codes, '');
   currency.value = codes.includes('USD') ? 'USD' : codes[0];
   currency.addEventListener('change', () => render(currency.value));
@@ -488,14 +491,14 @@ function render(code) {
   let datasets = [];
 
   if (compareBetaEnabled) {
-    const activeCodes = compareCodes.filter((item) => series[item]?.length).slice(0, 3);
+    const activeCodes = compareCodes.filter((item) => series[item]?.length).slice(0, 5);
     const normalizedGroups = activeCodes.map((item) => ({
       code: item,
       points: normalizeSeries(filterPoints(series[item] || [], currentPeriod)),
     })).filter((group) => group.points.length);
     labels = normalizedGroups[0]?.points.map((point) => toKstShort(point.t)) || [];
     datasets = normalizedGroups.map((group, index) => ({
-      label: `${group.code} 움직임`,
+      label: group.code,
       data: group.points.map((point) => point.nv),
       borderColor: COMPARE_COLORS[index % COMPARE_COLORS.length],
       backgroundColor: 'transparent',
