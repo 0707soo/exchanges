@@ -62,6 +62,16 @@ const shiftDateInputValue = (dateValue, days) => {
   return toDateInputValue(base.toISOString());
 };
 const getTodayKstValue = () => toDateInputValue(new Date().toISOString());
+function getLatestPublishedDateValue() {
+  if (latest?.published_at_kst) {
+    return toDateInputValue(new Date(latest.published_at_kst).toISOString());
+  }
+  if (latest?.published_text) {
+    const normalized = normalizeDateTimeText(latest.published_text).replace(' ', 'T') + '+09:00';
+    return toDateInputValue(new Date(normalized).toISOString());
+  }
+  return toDateInputValue(latest?.captured_at_utc || new Date().toISOString());
+}
 function getRangeWindow(period) {
   const endDate = currentEndDate || toDateInputValue(latest?.captured_at_utc || new Date().toISOString());
   const start = new Date(`${endDate}T00:00:00+09:00`);
@@ -142,11 +152,7 @@ function renderComparePanel() {
   const panel = document.getElementById('beta-compare-panel');
   const list = document.getElementById('beta-compare-list');
   if (!panel || !list) return;
-  if (!compareBetaEnabled) {
-    panel.hidden = true;
-    return;
-  }
-  panel.hidden = false;
+  if (!compareBetaEnabled) return;
   const codes = Object.keys(latest?.rows || {}).sort();
   list.innerHTML = codes.map((code) => `
     <button type="button" data-compare-code="${code}" class="${compareCodes.includes(code) ? 'active' : ''}">${code}</button>
@@ -357,7 +363,7 @@ async function load() {
   seriesByPeriod['1d'] = s.series || {};
   seriesByPeriod['7d'] = s.series || {};
   seriesByPeriod['30d'] = s.series || {};
-  const latestDate = toDateInputValue(latest.captured_at_utc);
+  const latestDate = getLatestPublishedDateValue();
   currentEndDate = getTodayKstValue();
   if (currentEndDate > latestDate) currentEndDate = latestDate;
 
@@ -514,6 +520,14 @@ function render(code) {
       fill: false,
     }));
   } else {
+    if (!points.length) {
+      const latestPublishedDate = getLatestPublishedDateValue();
+      if (currentEndDate > latestPublishedDate) {
+        currentEndDate = latestPublishedDate;
+        const rangeEndInput = document.getElementById('range-end-date');
+        if (rangeEndInput) rangeEndInput.value = currentEndDate;
+      }
+    }
     labels = points.map((point) => toKstShort(point.t));
     datasets = [{
       label: `${code} 매매기준율`,
