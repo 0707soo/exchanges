@@ -27,9 +27,10 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .card strong { font-size: 28px; letter-spacing: .3px; }
 .card-main { text-align: left; cursor: pointer; }
 .card-main:focus-visible { outline: 2px solid #67b7ff; outline-offset: 1px; }
-.extra-cards { display: none; grid-template-columns: repeat(2, 1fr); gap: 10px; grid-column: 2 / span 2; }
+.extra-cards { display: none; grid-template-columns: repeat(2, 1fr); gap: 10px; grid-column: 2 / span 2; align-content: start; }
 .cards.open .extra-cards { display: grid; }
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.summary-inline { grid-column: 1 / -1; }
 .summary-card { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
 .summary-card span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #9fb0d0; }
 .summary-card strong { display: block; font-size: 20px; letter-spacing: .2px; }
@@ -79,6 +80,7 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
   .card { padding: 10px; }
   .card strong { font-size: 26px; }
   .summary { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .summary-inline { grid-column: auto; }
   .summary-card { padding: 10px; }
   .summary-card strong { font-size: 18px; }
   .summary-card em { margin-top: 2px; font-size: 11px; }
