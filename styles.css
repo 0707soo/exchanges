@@ -4,7 +4,7 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #0b1220; color
 h1 { margin: 0 0 8px; }
 .status-banner { margin: 0 0 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #6a2a2a; background: #2a1212; color: #ffd7d7; font-size: 14px; line-height: 1.5; }
 .status-banner.ok { border-color: #264b2d; background: #102016; color: #cfeeda; }
-.dashboard { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.dashboard { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 16px; align-items: start; margin-bottom: 16px; }
 .dashboard-sidebar { display: grid; gap: 14px; }
 .panel { background: #111a2d; border: 1px solid #2a3c61; border-radius: 12px; padding: 14px; }
 .meta { color: #9fb0d0; margin: 0; font-size: 14px; }
@@ -42,10 +42,10 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .hint-button { width: 18px; height: 18px; padding: 0; border-radius: 999px; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; color: #9fb0d0; }
 .hint-button:hover { border-color: #67b7ff; color: #67b7ff; }
 .chart { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
-.chart-panel { min-height: 100%; }
+.chart-panel { min-height: 100%; overflow: hidden; }
 .chart-box { position: relative; height: 520px; }
 #chart { display: block; width: 100% !important; height: 100% !important; }
-.recent-updates { margin-top: 16px; background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
+.recent-updates { margin-top: 0; background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; position: relative; z-index: 0; }
 .section-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .section-title-row h2 { margin: 0; font-size: 18px; }
 .section-title-row span { color: #9fb0d0; font-size: 13px; }
@@ -88,7 +88,8 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
   .extra-cards { grid-template-columns: 1fr; grid-column: auto; gap: 8px; }
   .chart { padding: 10px; }
   .chart-box { height: 280px; }
-  .recent-updates { margin-top: 12px; padding: 10px; }
+  .dashboard { margin-bottom: 12px; }
+  .recent-updates { margin-top: 0; padding: 10px; }
   .section-title-row { margin-bottom: 8px; }
   .section-title-row h2 { font-size: 16px; }
   .section-title-row span { font-size: 12px; }
