@@ -1,26 +1,26 @@
 [
   {
-    "attempted_at_utc": "2026-04-24T20:14:55.877410+00:00",
+    "attempted_at_utc": "2026-04-24T20:25:20.104741+00:00",
     "exit_code": 0,
     "changed": false,
-    "sequence_before": 1050,
-    "sequence_after": 1050,
-    "log_excerpt": [
-      "rows=58 changed=False sequence=1050"
-    ]
-  },
-  {
-    "attempted_at_utc": "2026-04-24T20:17:03.080855+00:00",
-    "exit_code": 0,
-    "changed": true,
-    "sequence_before": 1050,
+    "sequence_before": 1051,
     "sequence_after": 1051,
     "log_excerpt": [
-      "rows=58 changed=True sequence=1051"
+      "rows=58 changed=False sequence=1051"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-24T20:19:14.369134+00:00",
+    "attempted_at_utc": "2026-04-24T20:27:28.304195+00:00",
+    "exit_code": 0,
+    "changed": false,
+    "sequence_before": 1051,
+    "sequence_after": 1051,
+    "log_excerpt": [
+      "rows=58 changed=False sequence=1051"
+    ]
+  },
+  {
+    "attempted_at_utc": "2026-04-24T20:29:40.362563+00:00",
     "exit_code": 0,
     "changed": false,
     "sequence_before": 1051,
