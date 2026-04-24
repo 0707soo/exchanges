@@ -15,6 +15,10 @@ let compareCodes = ['USD', 'CNY', 'JPY', 'GBP', 'EUR'];
 const FIXED_FAVORITE_CODES = ['USD', 'JPY', 'CNY'];
 const COMPARE_COLORS = ['#67b7ff', '#ff8f8f', '#7ee0a1', '#f5c26b', '#d29bff'];
 
+function applyModeVisibility() {
+  document.body.classList.toggle('compare-mode', compareBetaEnabled);
+}
+
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul',
@@ -348,7 +352,7 @@ async function load() {
   ]);
   latest = l;
   fetchStatus = status;
-  if (compareBetaEnabled) document.body.classList.add('compare-mode');
+  applyModeVisibility();
   recentSnapshots = await loadRecentSnapshots();
   seriesByPeriod['1d'] = s.series || {};
   seriesByPeriod['7d'] = s.series || {};
@@ -485,8 +489,10 @@ function render(code) {
 
   const series = seriesByPeriod[currentPeriod] || {};
   const points = filterPoints(series[code] || [], currentPeriod);
-  renderRecentUpdates(code, points);
-  updateSummary(points);
+  if (!compareBetaEnabled) {
+    renderRecentUpdates(code, points);
+    updateSummary(points);
+  }
   let labels = [];
   let datasets = [];
 
