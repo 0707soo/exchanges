@@ -62,12 +62,32 @@ canvas { width: 100%; height: 520px; }
   canvas { height: 400px; }
 }
 @media (max-width: 720px) {
-  .wrap { padding: 16px; }
-  .panel { padding: 12px; }
-  .cards { grid-template-columns: 1fr; }
-  .summary { grid-template-columns: 1fr 1fr; }
-  .extra-cards { grid-template-columns: 1fr; grid-column: auto; }
-  canvas { height: 300px; }
-  .recent-table { font-size: 13px; }
-  .recent-table th, .recent-table td { padding: 9px 6px; }
+  .wrap { padding: 12px; }
+  h1 { margin-bottom: 6px; font-size: 24px; }
+  .status-banner { margin-bottom: 10px; padding: 10px 12px; font-size: 13px; }
+  .dashboard-sidebar { gap: 10px; }
+  .panel { padding: 10px; border-radius: 10px; }
+  .meta { font-size: 13px; }
+  .meta-line { margin: 1px 0; }
+  .controls { gap: 8px; }
+  select, button, input[type="date"], input[type="search"] { padding: 7px 9px; font-size: 14px; }
+  .quick, .periods, .range-presets { gap: 5px; }
+  .range-end { gap: 6px; }
+  .range-end label { font-size: 12px; }
+  .cards { grid-template-columns: 1fr; gap: 8px; }
+  .card { padding: 10px; }
+  .card strong { font-size: 26px; }
+  .summary { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .summary-card { padding: 10px; }
+  .summary-card strong { font-size: 18px; }
+  .summary-card em { margin-top: 2px; font-size: 11px; }
+  .extra-cards { grid-template-columns: 1fr; grid-column: auto; gap: 8px; }
+  .chart { padding: 10px; }
+  canvas { height: 280px; }
+  .recent-updates { margin-top: 12px; padding: 10px; }
+  .section-title-row { margin-bottom: 8px; }
+  .section-title-row h2 { font-size: 16px; }
+  .section-title-row span { font-size: 12px; }
+  .recent-table { font-size: 12px; }
+  .recent-table th, .recent-table td { padding: 8px 5px; }
 }
