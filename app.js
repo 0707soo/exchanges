@@ -223,15 +223,13 @@ async function loadStatus() {
 }
 
 function updateSummary(points) {
-  const current = document.getElementById('summary-current');
   const minmax = document.getElementById('summary-minmax');
   const range = document.getElementById('summary-range');
   const change = document.getElementById('summary-change');
   const changePct = document.getElementById('summary-change-pct');
-  if (!current || !minmax || !range || !change || !changePct) return;
+  if (!minmax || !range || !change || !changePct) return;
 
   if (!points.length) {
-    current.textContent = '-';
     minmax.textContent = '-';
     range.textContent = '-';
     change.textContent = '-';
@@ -252,7 +250,6 @@ function updateSummary(points) {
   const rangeValue = highValue - lowValue;
   const changeValue = currentValue - firstValue;
   const changePercent = firstValue ? (changeValue / firstValue) * 100 : 0;
-  current.textContent = fmt(currentValue);
   minmax.textContent = `${fmt(lowValue)} ~ ${fmt(highValue)}`;
   range.textContent = fmt(rangeValue);
   setTextAndClass(change, `${changeValue > 0 ? '+' : ''}${fmt(changeValue)}`, getDiffClass(changeValue));
@@ -412,8 +409,6 @@ function render(code) {
   renderFavoriteCodes(code);
 
   document.getElementById('base').textContent = fmt(row.base_rate);
-  document.getElementById('send').textContent = fmt(row.send);
-  document.getElementById('receive').textContent = fmt(row.receive);
 
   const series = seriesByPeriod[currentPeriod] || {};
   const points = filterPoints(series[code] || [], currentPeriod);
