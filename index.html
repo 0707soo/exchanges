@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260424-13" />
+    <link rel="stylesheet" href="styles.css?v=20260424-14" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -25,21 +25,21 @@
             </div>
           </button>
 
-          <button class="panel controls controls-toggle" id="controls-toggle" aria-expanded="false" aria-controls="controls-details" type="button">
-            <div class="controls-compact" id="controls-compact">로딩 중...</div>
-            <div class="controls-details" id="controls-details">
-              <div class="control-group">
-                <div class="control-stack">
-                  <input id="currency-search" type="search" placeholder="통화 검색 (USD, 일본)" />
-                  <select id="currency"></select>
-                </div>
-                <div class="quick" id="favorite-codes">
-                  <button data-favorite-code="USD" type="button">USD</button>
-                  <button data-favorite-code="JPY" type="button">JPY</button>
-                  <button data-favorite-code="CNY" type="button">CNY</button>
-                </div>
+          <section class="panel controls">
+            <div class="control-group control-group-always">
+              <div class="control-stack">
+                <input id="currency-search" type="search" placeholder="통화 검색 (USD, 일본)" />
+                <select id="currency"></select>
               </div>
-              <div class="control-group">
+              <div class="quick" id="favorite-codes">
+                <button data-favorite-code="USD" type="button">USD</button>
+                <button data-favorite-code="JPY" type="button">JPY</button>
+                <button data-favorite-code="CNY" type="button">CNY</button>
+              </div>
+            </div>
+            <button class="control-group controls-toggle" id="controls-toggle" aria-expanded="false" aria-controls="controls-details" type="button">
+              <div class="controls-compact" id="controls-compact">로딩 중...</div>
+              <div class="controls-details" id="controls-details">
                 <div class="periods" id="periods">
                   <button data-period="1d" class="active" type="button">1일</button>
                   <button data-period="7d" type="button">1주</button>
@@ -55,8 +55,8 @@
                   <button data-range-preset="yesterday" type="button">어제</button>
                 </div>
               </div>
-            </div>
-          </button>
+            </button>
+          </section>
 
           <section class="cards" id="cards">
             <button class="card card-main" id="base-toggle" aria-expanded="false" aria-controls="extra-cards" type="button">
@@ -102,6 +102,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260424-13"></script>
+    <script src="app.js?v=20260424-14"></script>
   </body>
 </html>

@@ -18,6 +18,7 @@ h1 { margin: 0 0 8px; }
 .controls-details { display: none; margin-top: 10px; }
 .controls-toggle.open .controls-details { display: grid; gap: 12px; }
 .control-group { display: grid; gap: 8px; padding: 10px; border: 1px solid #1d2b49; border-radius: 10px; background: rgba(18, 29, 49, 0.65); }
+.control-group-always { cursor: default; }
 .control-stack { display: grid; gap: 8px; }
 select, button, input[type="date"], input[type="search"] { background: #17233b; color: #e8eefc; border: 1px solid #2f446f; border-radius: 8px; padding: 8px 10px; }
 #currency-search { min-width: 220px; width: 100%; box-sizing: border-box; }

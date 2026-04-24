@@ -421,7 +421,7 @@ async function load() {
 
   const controlsToggle = document.getElementById('controls-toggle');
   controlsToggle.addEventListener('click', (event) => {
-    const interactive = event.target.closest('input, select, button[data-favorite-code], #periods button, #range-presets button, #date-prev, #date-next');
+    const interactive = event.target.closest('#periods button, #range-presets button, #date-prev, #date-next, #range-end-date');
     if (interactive) return;
     controlsOpen = !controlsOpen;
     syncControlsVisibility();
