@@ -7,8 +7,10 @@ h1 { margin: 0 0 8px; }
 .meta { color: #9fb0d0; margin: 0 0 16px; font-size: 14px; }
 .meta-line { margin: 2px 0; }
 .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
-select, button, input[type="date"] { background: #17233b; color: #e8eefc; border: 1px solid #2f446f; border-radius: 8px; padding: 8px 10px; }
-.quick { display: flex; gap: 6px; }
+select, button, input[type="date"], input[type="search"] { background: #17233b; color: #e8eefc; border: 1px solid #2f446f; border-radius: 8px; padding: 8px 10px; }
+#currency-search { min-width: 220px; }
+.quick { display: flex; gap: 6px; flex-wrap: wrap; }
+.quick button.active { border-color: #67b7ff; color: #67b7ff; }
 .periods { display: flex; gap: 6px; }
 .periods button.active { border-color: #67b7ff; color: #67b7ff; }
 .range-end { display: flex; align-items: center; gap: 8px; }
@@ -24,9 +26,14 @@ select, button, input[type="date"] { background: #17233b; color: #e8eefc; border
 .cards.open .extra-cards { display: grid; }
 .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
 .summary-card { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
-.summary-card span { display: block; font-size: 12px; color: #9fb0d0; }
+.summary-card span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #9fb0d0; }
 .summary-card strong { display: block; font-size: 20px; letter-spacing: .2px; }
 .summary-card em { display: block; margin-top: 4px; font-style: normal; font-size: 12px; color: #9fb0d0; }
+.summary-card .value-up, .summary-card .pct-up { color: #7ee787; }
+.summary-card .value-down, .summary-card .pct-down { color: #ff9b9b; }
+.summary-card .value-neutral, .summary-card .pct-neutral { color: #9fb0d0; }
+.hint-button { width: 18px; height: 18px; padding: 0; border-radius: 999px; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; color: #9fb0d0; }
+.hint-button:hover { border-color: #67b7ff; color: #67b7ff; }
 .chart { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
 canvas { width: 100%; height: 380px; }
 .recent-updates { margin-top: 16px; background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
@@ -38,6 +45,7 @@ canvas { width: 100%; height: 380px; }
 .recent-table th, .recent-table td { padding: 10px 8px; border-bottom: 1px solid #1d2b49; text-align: left; white-space: nowrap; }
 .recent-table th { color: #9fb0d0; font-weight: 600; }
 .recent-table tbody tr:last-child td { border-bottom: 0; }
+.recent-table tbody tr.is-latest td { background: rgba(103, 183, 255, 0.08); }
 .diff-up { color: #7ee787; }
 .diff-down { color: #ff9b9b; }
 .diff-neutral { color: #9fb0d0; }

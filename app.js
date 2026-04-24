@@ -6,6 +6,10 @@ let chart;
 let detailsOpen = false;
 let currentPeriod = '1d';
 let currentEndDate = null;
+let filteredCodes = [];
+let favoriteCodes = [];
+
+const FAVORITES_STORAGE_KEY = 'exchange-favorite-codes';
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
@@ -103,6 +107,67 @@ async function loadRecentSnapshots() {
   return [];
 }
 
+function getDiffClass(value) {
+  if (value > 0) return 'value-up';
+  if (value < 0) return 'value-down';
+  return 'value-neutral';
+}
+
+function setTextAndClass(el, text, className) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('value-up', 'value-down', 'value-neutral', 'pct-up', 'pct-down', 'pct-neutral');
+  if (className) el.classList.add(className);
+}
+
+function loadFavoriteCodes(codes) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || '[]');
+    if (Array.isArray(saved)) return saved.filter((code) => codes.includes(code)).slice(0, 6);
+  } catch {}
+  return ['USD', 'JPY', 'CNY', 'EUR'].filter((code) => codes.includes(code));
+}
+
+function saveFavoriteCodes() {
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteCodes.slice(0, 6)));
+  } catch {}
+}
+
+function renderFavoriteCodes(selectedCode) {
+  const quick = document.getElementById('favorite-codes');
+  if (!quick) return;
+  quick.innerHTML = favoriteCodes.map((code) => `
+    <button data-favorite-code="${code}" class="${code === selectedCode ? 'active' : ''}" type="button">${code}</button>
+  `).join('');
+  quick.querySelectorAll('[data-favorite-code]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const code = btn.dataset.favoriteCode;
+      const currency = document.getElementById('currency');
+      currency.value = code;
+      render(code);
+    });
+  });
+}
+
+function updateFavoriteCodes(code) {
+  favoriteCodes = [code, ...favoriteCodes.filter((item) => item !== code)].slice(0, 6);
+  saveFavoriteCodes();
+  renderFavoriteCodes(code);
+}
+
+function applyCurrencyFilter(allCodes, keyword) {
+  const currency = document.getElementById('currency');
+  const term = keyword.trim().toLowerCase();
+  filteredCodes = allCodes.filter((code) => {
+    const row = latest.rows[code];
+    const haystack = `${code} ${row.country}`.toLowerCase();
+    return !term || haystack.includes(term);
+  });
+  currency.innerHTML = filteredCodes.map((code) => `<option value="${code}">${code} - ${latest.rows[code].country}</option>`).join('');
+  return filteredCodes;
+}
+
 function renderRecentUpdates(code) {
   const body = document.getElementById('recent-updates-body');
   const caption = document.getElementById('recent-updates-caption');
@@ -123,7 +188,7 @@ function renderRecentUpdates(code) {
 
   const baseline = items.length ? Number(items[items.length - 1].rows[code].base_rate) : null;
 
-  body.innerHTML = items.map((snap) => {
+  body.innerHTML = items.map((snap, index) => {
     const currentRate = Number(snap.rows[code].base_rate);
     const diff = baseline == null ? null : currentRate - baseline;
     const diffText = diff == null ? '-' : `${diff > 0 ? '+' : ''}${fmt(diff)}`;
@@ -132,7 +197,7 @@ function renderRecentUpdates(code) {
       ? normalizeDateTimeText(snap.published_text)
       : (snap.published_at_kst ? toKst(snap.published_at_kst) : '-');
     return `
-      <tr>
+      <tr class="${index === 0 ? 'is-latest' : ''}">
         <td>${published}</td>
         <td>${snap.sequence || '-'}</td>
         <td>${fmt(currentRate)}</td>
@@ -185,8 +250,8 @@ function updateSummary(points) {
   current.textContent = fmt(currentValue);
   minmax.textContent = `${fmt(lowValue)} ~ ${fmt(highValue)}`;
   range.textContent = fmt(rangeValue);
-  change.textContent = `${changeValue > 0 ? '+' : ''}${fmt(changeValue)}`;
-  changePct.textContent = `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
+  setTextAndClass(change, `${changeValue > 0 ? '+' : ''}${fmt(changeValue)}`, getDiffClass(changeValue));
+  setTextAndClass(changePct, `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`, getDiffClass(changePercent).replace('value', 'pct'));
 }
 
 function renderFetchStatus() {
@@ -243,18 +308,22 @@ async function load() {
 
   const currency = document.getElementById('currency');
   const codes = Object.keys(latest.rows).sort();
-  currency.innerHTML = codes.map(c => `<option value="${c}">${c} - ${latest.rows[c].country}</option>`).join('');
+  favoriteCodes = loadFavoriteCodes(codes);
+  applyCurrencyFilter(codes, '');
   currency.value = codes.includes('USD') ? 'USD' : codes[0];
   currency.addEventListener('change', () => render(currency.value));
 
-  document.querySelectorAll('[data-code]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (codes.includes(btn.dataset.code)) {
-        currency.value = btn.dataset.code;
-        render(btn.dataset.code);
-      }
-    });
+  const currencySearch = document.getElementById('currency-search');
+  currencySearch.addEventListener('input', () => {
+    const matches = applyCurrencyFilter(codes, currencySearch.value);
+    const fallback = matches.includes(currency.value) ? currency.value : (matches[0] || '');
+    if (fallback) {
+      currency.value = fallback;
+      render(fallback);
+    }
   });
+
+  renderFavoriteCodes(currency.value);
 
   document.querySelectorAll('#periods [data-period]').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -288,6 +357,11 @@ async function load() {
     });
   });
 
+  document.querySelectorAll('.hint-button').forEach((btn) => {
+    btn.title = btn.dataset.hint || '';
+    btn.setAttribute('aria-label', btn.dataset.hint || '설명');
+  });
+
   document.getElementById('meta-published').textContent = `고시: ${normalizeDateTimeText(latest.published_text) || '-'} (${latest.sequence || '-'}회차)`;
   document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${formatKstDateTime(latest.captured_at_utc)}`;
   document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
@@ -317,6 +391,7 @@ function render(code) {
   const row = latest.rows[code];
   if (!row) return;
 
+  updateFavoriteCodes(code);
   renderRecentUpdates(code);
 
   document.getElementById('base').textContent = fmt(row.base_rate);

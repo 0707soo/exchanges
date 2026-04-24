@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260424-3" />
+    <link rel="stylesheet" href="styles.css?v=20260424-4" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -21,13 +21,9 @@
 
       <section class="controls">
         <label for="currency">통화</label>
+        <input id="currency-search" type="search" placeholder="통화 검색 (USD, 달러, 일본)" />
         <select id="currency"></select>
-        <div class="quick">
-          <button data-code="USD">USD</button>
-          <button data-code="JPY">JPY</button>
-          <button data-code="CNY">CNY</button>
-          <button data-code="EUR">EUR</button>
-        </div>
+        <div class="quick" id="favorite-codes"></div>
         <div class="periods" id="periods">
           <button data-period="1d" class="active" type="button">1일</button>
           <button data-period="7d" type="button">1주</button>
@@ -56,9 +52,9 @@
 
       <section class="summary" id="summary">
         <div class="summary-card"><span>현재</span><strong id="summary-current">-</strong></div>
-        <div class="summary-card"><span>기간 내</span><strong id="summary-minmax">-</strong></div>
-        <div class="summary-card"><span>변동폭</span><strong id="summary-range">-</strong></div>
-        <div class="summary-card"><span>시작 대비</span><strong id="summary-change">-</strong><em id="summary-change-pct">-</em></div>
+        <div class="summary-card"><span>기간 내 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최소 ~ 최대입니다.">?</button></span><strong id="summary-minmax">-</strong></div>
+        <div class="summary-card"><span>변동폭 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최대값과 최소값 차이입니다.">?</button></span><strong id="summary-range">-</strong></div>
+        <div class="summary-card"><span>시작 대비 <button class="hint-button" type="button" data-hint="선택한 기간의 첫 값 대비 현재 변화입니다.">?</button></span><strong id="summary-change">-</strong><em id="summary-change-pct">-</em></div>
       </section>
 
       <section class="chart">
@@ -87,6 +83,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260424-3"></script>
+    <script src="app.js?v=20260424-4"></script>
   </body>
 </html>
