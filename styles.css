@@ -35,6 +35,7 @@ body.compare-mode #recent-updates-section,
 body.compare-mode #cards,
 body.compare-mode .control-group-always,
 body.compare-mode .meta-toggle { display: none !important; }
+body.compare-mode #beta-compare-panel { display: grid !important; }
 body.compare-mode .dashboard { grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); }
 body.compare-mode .controls { align-self: start; }
 body.compare-mode .chart-panel { min-height: 0; }
