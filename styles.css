@@ -43,8 +43,8 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .hint-button:hover { border-color: #67b7ff; color: #67b7ff; }
 .chart { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
 .chart-panel { overflow: hidden; }
-.chart-box { position: relative; height: 520px; }
-#chart { display: block; width: 100% !important; height: 100% !important; }
+.chart-box { position: relative; height: 520px; overflow: hidden; }
+#chart { display: block; width: 100% !important; height: 100% !important; max-height: 100% !important; }
 .recent-updates { margin-top: 0; background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; position: relative; z-index: 0; }
 .section-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .section-title-row h2 { margin: 0; font-size: 18px; }
@@ -86,8 +86,9 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
   .summary-card strong { font-size: 18px; }
   .summary-card em { margin-top: 2px; font-size: 11px; }
   .extra-cards { grid-template-columns: 1fr; grid-column: auto; gap: 8px; }
-  .chart { padding: 10px; }
-  .chart-box { height: 280px; }
+  .chart { padding: 8px; }
+  .chart-box { height: 280px; max-height: 280px; overflow: hidden; }
+  #chart { height: 280px !important; max-height: 280px !important; }
   .dashboard { margin-bottom: 12px; }
   .recent-updates { margin-top: 0; padding: 10px; }
   .section-title-row { margin-bottom: 8px; }
