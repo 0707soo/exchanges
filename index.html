@@ -4,70 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260424-5" />
+    <link rel="stylesheet" href="styles.css?v=20260424-6" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <main class="wrap">
       <h1>Exchange Tracker</h1>
       <div class="status-banner" id="status-banner" hidden></div>
-      <div class="meta">
-        <p class="meta-line" id="meta-published">고시: 로딩 중...</p>
-        <p class="meta-line" id="meta-collected">수집: 로딩 중...</p>
-        <p class="meta-line" id="meta-detected">최종 감지: 로딩 중...</p>
-        <p class="meta-line" id="meta-status">수집 상태: 로딩 중...</p>
-        <p class="meta-line" id="meta-last-success">마지막 성공 수집: 로딩 중...</p>
-      </div>
 
-      <section class="controls">
-        <label for="currency">통화</label>
-        <input id="currency-search" type="search" placeholder="통화 검색 (USD, 일본)" />
-        <select id="currency"></select>
-        <div class="quick" id="favorite-codes">
-          <button data-favorite-code="USD" type="button">USD</button>
-          <button data-favorite-code="JPY" type="button">JPY</button>
-          <button data-favorite-code="CNY" type="button">CNY</button>
+      <section class="dashboard">
+        <div class="dashboard-sidebar">
+          <div class="panel panel-meta">
+            <div class="meta">
+              <p class="meta-line" id="meta-published">고시: 로딩 중...</p>
+              <p class="meta-line" id="meta-collected">수집: 로딩 중...</p>
+              <p class="meta-line" id="meta-detected">최종 감지: 로딩 중...</p>
+              <p class="meta-line" id="meta-status">수집 상태: 로딩 중...</p>
+              <p class="meta-line" id="meta-last-success">마지막 성공 수집: 로딩 중...</p>
+            </div>
+          </div>
+
+          <section class="panel controls">
+            <label for="currency">통화</label>
+            <input id="currency-search" type="search" placeholder="통화 검색 (USD, 일본)" />
+            <select id="currency"></select>
+            <div class="quick" id="favorite-codes">
+              <button data-favorite-code="USD" type="button">USD</button>
+              <button data-favorite-code="JPY" type="button">JPY</button>
+              <button data-favorite-code="CNY" type="button">CNY</button>
+            </div>
+            <div class="periods" id="periods">
+              <button data-period="1d" class="active" type="button">1일</button>
+              <button data-period="7d" type="button">1주</button>
+              <button data-period="30d" type="button">1개월</button>
+            </div>
+            <div class="range-end">
+              <label for="range-end-date">기준 날짜</label>
+              <button id="date-prev" type="button" aria-label="이전 날짜">◀</button>
+              <input id="range-end-date" type="date" />
+              <button id="date-next" type="button" aria-label="다음 날짜">▶</button>
+            </div>
+            <div class="range-presets" id="range-presets">
+              <button data-range-preset="today" type="button">오늘</button>
+              <button data-range-preset="yesterday" type="button">어제</button>
+            </div>
+          </section>
+
+          <section class="cards" id="cards">
+            <button class="card card-main" id="base-toggle" aria-expanded="false" aria-controls="extra-cards" type="button">
+              <span>매매기준율</span>
+              <strong id="base">-</strong>
+            </button>
+            <div class="extra-cards" id="extra-cards">
+              <div class="card"><span>송금 보낼때</span><strong id="send">-</strong></div>
+              <div class="card"><span>송금 받을때</span><strong id="receive">-</strong></div>
+            </div>
+          </section>
+
+          <section class="summary" id="summary">
+            <div class="summary-card"><span>현재</span><strong id="summary-current">-</strong></div>
+            <div class="summary-card"><span>기간 내 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최소 ~ 최대입니다.">?</button></span><strong id="summary-minmax">-</strong></div>
+            <div class="summary-card"><span>변동폭 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최대값과 최소값 차이입니다.">?</button></span><strong id="summary-range">-</strong></div>
+            <div class="summary-card"><span>시작 대비 <button class="hint-button" type="button" data-hint="선택한 기간의 첫 값 대비 현재 변화입니다.">?</button></span><strong id="summary-change">-</strong><em id="summary-change-pct">-</em></div>
+          </section>
         </div>
-        <div class="periods" id="periods">
-          <button data-period="1d" class="active" type="button">1일</button>
-          <button data-period="7d" type="button">1주</button>
-          <button data-period="30d" type="button">1개월</button>
-        </div>
-        <div class="range-end">
-          <label for="range-end-date">기준 날짜</label>
-          <button id="date-prev" type="button" aria-label="이전 날짜">◀</button>
-          <input id="range-end-date" type="date" />
-          <button id="date-next" type="button" aria-label="다음 날짜">▶</button>
-        </div>
-        <div class="range-presets" id="range-presets">
-          <button data-range-preset="today" type="button">오늘</button>
-          <button data-range-preset="yesterday" type="button">어제</button>
-        </div>
+
+        <section class="panel chart chart-panel">
+          <canvas id="chart"></canvas>
+        </section>
       </section>
 
-      <section class="cards" id="cards">
-        <button class="card card-main" id="base-toggle" aria-expanded="false" aria-controls="extra-cards" type="button">
-          <span>매매기준율</span>
-          <strong id="base">-</strong>
-        </button>
-        <div class="extra-cards" id="extra-cards">
-          <div class="card"><span>송금 보낼때</span><strong id="send">-</strong></div>
-          <div class="card"><span>송금 받을때</span><strong id="receive">-</strong></div>
-        </div>
-      </section>
-
-      <section class="summary" id="summary">
-        <div class="summary-card"><span>현재</span><strong id="summary-current">-</strong></div>
-        <div class="summary-card"><span>기간 내 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최소 ~ 최대입니다.">?</button></span><strong id="summary-minmax">-</strong></div>
-        <div class="summary-card"><span>변동폭 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최대값과 최소값 차이입니다.">?</button></span><strong id="summary-range">-</strong></div>
-        <div class="summary-card"><span>시작 대비 <button class="hint-button" type="button" data-hint="선택한 기간의 첫 값 대비 현재 변화입니다.">?</button></span><strong id="summary-change">-</strong><em id="summary-change-pct">-</em></div>
-      </section>
-
-      <section class="chart">
-        <canvas id="chart"></canvas>
-      </section>
-
-      <section class="recent-updates">
+      <section class="recent-updates panel">
         <div class="section-title-row">
           <h2>최근 변동</h2>
           <span id="recent-updates-caption">로딩 중...</span>
@@ -89,6 +96,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260424-5"></script>
+    <script src="app.js?v=20260424-6"></script>
   </body>
 </html>

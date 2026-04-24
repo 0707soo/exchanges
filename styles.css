@@ -1,23 +1,27 @@
 :root { color-scheme: dark; }
 body { margin: 0; font-family: system-ui, sans-serif; background: #0b1220; color: #e8eefc; }
-.wrap { max-width: 1000px; margin: 0 auto; padding: 20px; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 20px; }
 h1 { margin: 0 0 8px; }
 .status-banner { margin: 0 0 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #6a2a2a; background: #2a1212; color: #ffd7d7; font-size: 14px; line-height: 1.5; }
 .status-banner.ok { border-color: #264b2d; background: #102016; color: #cfeeda; }
-.meta { color: #9fb0d0; margin: 0 0 16px; font-size: 14px; }
+.dashboard { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.dashboard-sidebar { display: grid; gap: 14px; }
+.panel { background: #111a2d; border: 1px solid #2a3c61; border-radius: 12px; padding: 14px; }
+.meta { color: #9fb0d0; margin: 0; font-size: 14px; }
 .meta-line { margin: 2px 0; }
-.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.controls { display: grid; gap: 10px; align-items: center; }
 select, button, input[type="date"], input[type="search"] { background: #17233b; color: #e8eefc; border: 1px solid #2f446f; border-radius: 8px; padding: 8px 10px; }
-#currency-search { min-width: 220px; }
+#currency-search { min-width: 220px; width: 100%; box-sizing: border-box; }
+#currency { width: 100%; }
 .quick { display: flex; gap: 6px; flex-wrap: wrap; }
 .quick button.active { border-color: #67b7ff; color: #67b7ff; }
-.periods { display: flex; gap: 6px; }
+.periods { display: flex; gap: 6px; flex-wrap: wrap; }
 .periods button.active { border-color: #67b7ff; color: #67b7ff; }
-.range-end { display: flex; align-items: center; gap: 8px; }
+.range-end { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .range-end label { color: #9fb0d0; font-size: 13px; }
 .range-end button { padding: 8px 9px; }
 .range-presets { display: flex; gap: 6px; flex-wrap: wrap; }
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .card { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
 .card span { display: block; font-size: 12px; color: #9fb0d0; }
 .card strong { font-size: 28px; letter-spacing: .3px; }
@@ -25,7 +29,7 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .card-main:focus-visible { outline: 2px solid #67b7ff; outline-offset: 1px; }
 .extra-cards { display: none; grid-template-columns: repeat(2, 1fr); gap: 10px; grid-column: 2 / span 2; }
 .cards.open .extra-cards { display: grid; }
-.summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .summary-card { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
 .summary-card span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #9fb0d0; }
 .summary-card strong { display: block; font-size: 20px; letter-spacing: .2px; }
@@ -36,7 +40,8 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .hint-button { width: 18px; height: 18px; padding: 0; border-radius: 999px; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; color: #9fb0d0; }
 .hint-button:hover { border-color: #67b7ff; color: #67b7ff; }
 .chart { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
-canvas { width: 100%; height: 380px; }
+.chart-panel { min-height: 100%; }
+canvas { width: 100%; height: 520px; }
 .recent-updates { margin-top: 16px; background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
 .section-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .section-title-row h2 { margin: 0; font-size: 18px; }
@@ -52,7 +57,13 @@ canvas { width: 100%; height: 380px; }
 .diff-up { color: #ff8f8f; }
 .diff-down { color: #7db8ff; }
 .diff-neutral { color: #9fb0d0; }
+@media (max-width: 1080px) {
+  .dashboard { grid-template-columns: 1fr; }
+  canvas { height: 400px; }
+}
 @media (max-width: 720px) {
+  .wrap { padding: 16px; }
+  .panel { padding: 12px; }
   .cards { grid-template-columns: 1fr; }
   .summary { grid-template-columns: 1fr 1fr; }
   .extra-cards { grid-template-columns: 1fr; grid-column: auto; }
