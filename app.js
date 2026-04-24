@@ -154,17 +154,15 @@ async function loadStatus() {
 
 function updateSummary(points) {
   const current = document.getElementById('summary-current');
-  const high = document.getElementById('summary-high');
-  const low = document.getElementById('summary-low');
+  const minmax = document.getElementById('summary-minmax');
   const range = document.getElementById('summary-range');
   const change = document.getElementById('summary-change');
   const changePct = document.getElementById('summary-change-pct');
-  if (!current || !high || !low || !range || !change || !changePct) return;
+  if (!current || !minmax || !range || !change || !changePct) return;
 
   if (!points.length) {
     current.textContent = '-';
-    high.textContent = '-';
-    low.textContent = '-';
+    minmax.textContent = '-';
     range.textContent = '-';
     change.textContent = '-';
     changePct.textContent = '-';
@@ -185,8 +183,7 @@ function updateSummary(points) {
   const changeValue = currentValue - firstValue;
   const changePercent = firstValue ? (changeValue / firstValue) * 100 : 0;
   current.textContent = fmt(currentValue);
-  high.textContent = fmt(highValue);
-  low.textContent = fmt(lowValue);
+  minmax.textContent = `${fmt(lowValue)} ~ ${fmt(highValue)}`;
   range.textContent = fmt(rangeValue);
   change.textContent = `${changeValue > 0 ? '+' : ''}${fmt(changeValue)}`;
   changePct.textContent = `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
