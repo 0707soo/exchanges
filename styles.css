@@ -40,8 +40,8 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .hint-button { width: 18px; height: 18px; padding: 0; border-radius: 999px; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; color: #9fb0d0; }
 .hint-button:hover { border-color: #67b7ff; color: #67b7ff; }
 .chart { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
-.chart-panel { min-height: 100%; }
-canvas { width: 100%; height: 520px; }
+.chart-panel { min-height: 100%; height: 520px; }
+#chart { display: block; width: 100% !important; height: 100% !important; }
 .recent-updates { margin-top: 16px; background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
 .section-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .section-title-row h2 { margin: 0; font-size: 18px; }
@@ -59,7 +59,7 @@ canvas { width: 100%; height: 520px; }
 .diff-neutral { color: #9fb0d0; }
 @media (max-width: 1080px) {
   .dashboard { grid-template-columns: 1fr; }
-  canvas { height: 400px; }
+  .chart-panel { height: 400px; }
 }
 @media (max-width: 720px) {
   .wrap { padding: 12px; }
@@ -83,7 +83,7 @@ canvas { width: 100%; height: 520px; }
   .summary-card em { margin-top: 2px; font-size: 11px; }
   .extra-cards { grid-template-columns: 1fr; grid-column: auto; gap: 8px; }
   .chart { padding: 10px; }
-  canvas { height: 280px; }
+  .chart-panel { height: 280px; min-height: 280px; }
   .recent-updates { margin-top: 12px; padding: 10px; }
   .section-title-row { margin-bottom: 8px; }
   .section-title-row h2 { font-size: 16px; }
