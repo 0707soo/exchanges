@@ -1,32 +1,32 @@
 [
   {
-    "attempted_at_utc": "2026-04-24T16:41:28.599085+00:00",
+    "attempted_at_utc": "2026-04-24T16:51:45.201333+00:00",
+    "exit_code": 0,
+    "changed": true,
+    "sequence_before": 707,
+    "sequence_after": 710,
+    "log_excerpt": [
+      "rows=58 changed=True sequence=710"
+    ]
+  },
+  {
+    "attempted_at_utc": "2026-04-24T16:53:58.618574+00:00",
     "exit_code": 0,
     "changed": false,
-    "sequence_before": 704,
-    "sequence_after": 704,
+    "sequence_before": 710,
+    "sequence_after": 710,
     "log_excerpt": [
-      "rows=58 changed=False sequence=704"
+      "rows=58 changed=False sequence=710"
     ]
   },
   {
-    "attempted_at_utc": "2026-04-24T16:43:36.612265+00:00",
+    "attempted_at_utc": "2026-04-24T16:56:03.946523+00:00",
     "exit_code": 0,
     "changed": true,
-    "sequence_before": 704,
-    "sequence_after": 705,
+    "sequence_before": 710,
+    "sequence_after": 711,
     "log_excerpt": [
-      "rows=58 changed=True sequence=705"
-    ]
-  },
-  {
-    "attempted_at_utc": "2026-04-24T16:45:43.567363+00:00",
-    "exit_code": 0,
-    "changed": true,
-    "sequence_before": 705,
-    "sequence_after": 707,
-    "log_excerpt": [
-      "rows=58 changed=True sequence=707"
+      "rows=58 changed=True sequence=711"
     ]
   }
 ]
