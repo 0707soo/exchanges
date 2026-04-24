@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260423-2" />
+    <link rel="stylesheet" href="styles.css?v=20260424-1" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -16,6 +16,7 @@
         <p class="meta-line" id="meta-collected">수집: 로딩 중...</p>
         <p class="meta-line" id="meta-detected">최종 감지: 로딩 중...</p>
         <p class="meta-line" id="meta-status">수집 상태: 로딩 중...</p>
+        <p class="meta-line" id="meta-last-success">마지막 성공 수집: 로딩 중...</p>
       </div>
 
       <section class="controls">
@@ -36,6 +37,11 @@
           <label for="range-end-date">기준 날짜</label>
           <input id="range-end-date" type="date" />
         </div>
+        <div class="range-presets" id="range-presets">
+          <button data-range-preset="today" type="button">오늘</button>
+          <button data-range-preset="yesterday" type="button">어제</button>
+          <button data-range-preset="latest" type="button">최신 고시</button>
+        </div>
       </section>
 
       <section class="cards" id="cards">
@@ -47,6 +53,13 @@
           <div class="card"><span>송금 보낼때</span><strong id="send">-</strong></div>
           <div class="card"><span>송금 받을때</span><strong id="receive">-</strong></div>
         </div>
+      </section>
+
+      <section class="summary" id="summary">
+        <div class="summary-card"><span>현재</span><strong id="summary-current">-</strong></div>
+        <div class="summary-card"><span>기간 최고</span><strong id="summary-high">-</strong></div>
+        <div class="summary-card"><span>기간 최저</span><strong id="summary-low">-</strong></div>
+        <div class="summary-card"><span>변동폭</span><strong id="summary-range">-</strong></div>
       </section>
 
       <section class="chart">
@@ -75,6 +88,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260423-2"></script>
+    <script src="app.js?v=20260424-1"></script>
   </body>
 </html>

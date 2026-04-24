@@ -44,6 +44,12 @@ const toDateInputValue = (iso) => {
   const get = (type) => parts.find((p) => p.type === type)?.value;
   return `${get('year')}-${get('month')}-${get('day')}`;
 };
+const shiftDateInputValue = (dateValue, days) => {
+  const base = new Date(`${dateValue}T12:00:00+09:00`);
+  base.setDate(base.getDate() + days);
+  return toDateInputValue(base.toISOString());
+};
+const getTodayKstValue = () => toDateInputValue(new Date().toISOString());
 function getRangeWindow(period) {
   const endDate = currentEndDate || toDateInputValue(latest?.captured_at_utc || new Date().toISOString());
   const start = new Date(`${endDate}T00:00:00+09:00`);
@@ -146,6 +152,31 @@ async function loadStatus() {
   }
 }
 
+function updateSummary(points) {
+  const current = document.getElementById('summary-current');
+  const high = document.getElementById('summary-high');
+  const low = document.getElementById('summary-low');
+  const range = document.getElementById('summary-range');
+  if (!current || !high || !low || !range) return;
+
+  if (!points.length) {
+    current.textContent = '-';
+    high.textContent = '-';
+    low.textContent = '-';
+    range.textContent = '-';
+    return;
+  }
+
+  const values = points.map((point) => Number(point.v));
+  const currentValue = values[values.length - 1];
+  const highValue = Math.max(...values);
+  const lowValue = Math.min(...values);
+  current.textContent = fmt(currentValue);
+  high.textContent = fmt(highValue);
+  low.textContent = fmt(lowValue);
+  range.textContent = fmt(highValue - lowValue);
+}
+
 function renderFetchStatus() {
   const statusLine = document.getElementById('meta-status');
   const banner = document.getElementById('status-banner');
@@ -153,6 +184,7 @@ function renderFetchStatus() {
 
   if (!fetchStatus) {
     statusLine.textContent = '수집 상태: 상태 파일 없음';
+    document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 확인 불가';
     banner.hidden = true;
     return;
   }
@@ -164,12 +196,17 @@ function renderFetchStatus() {
 
   if (success) {
     statusLine.textContent = `수집 상태: 정상 (${attempted})`;
+    const lastSuccessLine = fetchStatus.last_attempt_at_utc
+      ? `마지막 성공 수집: ${attempted}`
+      : '마지막 성공 수집: 확인 불가';
+    document.getElementById('meta-last-success').textContent = lastSuccessLine;
     banner.hidden = true;
     banner.classList.remove('ok');
     return;
   }
 
   const error = fetchStatus.last_error || '원인 정보 없음';
+  document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 확인 필요';
   statusLine.textContent = `수집 상태: 실패 (${attempted}, 연속 ${streak}회)`;
   banner.hidden = false;
   banner.classList.remove('ok');
@@ -188,7 +225,9 @@ async function load() {
   seriesByPeriod['1d'] = s.series || {};
   seriesByPeriod['7d'] = s.series || {};
   seriesByPeriod['30d'] = s.series || {};
-  currentEndDate = toDateInputValue(latest.captured_at_utc);
+  const latestDate = toDateInputValue(latest.captured_at_utc);
+  currentEndDate = getTodayKstValue();
+  if (currentEndDate > latestDate) currentEndDate = latestDate;
 
   const currency = document.getElementById('currency');
   const codes = Object.keys(latest.rows).sort();
@@ -218,15 +257,30 @@ async function load() {
 
   const rangeEndInput = document.getElementById('range-end-date');
   rangeEndInput.value = currentEndDate;
-  rangeEndInput.max = toDateInputValue(latest.captured_at_utc);
+  rangeEndInput.max = latestDate;
   rangeEndInput.addEventListener('change', () => {
-    currentEndDate = rangeEndInput.value || toDateInputValue(latest.captured_at_utc);
+    currentEndDate = rangeEndInput.value || getTodayKstValue();
+    if (currentEndDate > latestDate) currentEndDate = latestDate;
+    rangeEndInput.value = currentEndDate;
     render(currency.value);
+  });
+
+  document.querySelectorAll('#range-presets [data-range-preset]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const preset = btn.dataset.rangePreset;
+      if (preset === 'today') currentEndDate = getTodayKstValue();
+      if (preset === 'yesterday') currentEndDate = shiftDateInputValue(getTodayKstValue(), -1);
+      if (preset === 'latest') currentEndDate = latestDate;
+      if (currentEndDate > latestDate) currentEndDate = latestDate;
+      rangeEndInput.value = currentEndDate;
+      render(currency.value);
+    });
   });
 
   document.getElementById('meta-published').textContent = `고시: ${normalizeDateTimeText(latest.published_text) || '-'} (${latest.sequence || '-'}회차)`;
   document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${formatKstDateTime(latest.captured_at_utc)}`;
   document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
+  document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 로딩 중...';
   renderFetchStatus();
 
   const baseToggle = document.getElementById('base-toggle');
@@ -260,6 +314,7 @@ function render(code) {
 
   const series = seriesByPeriod[currentPeriod] || {};
   const points = filterPoints(series[code] || [], currentPeriod);
+  updateSummary(points);
   const labels = points.map(p => toKstShort(p.t));
   const values = points.map(p => p.v);
 
@@ -302,4 +357,6 @@ load().catch(err => {
   document.getElementById('meta-collected').textContent = '오류: ' + err.message;
   document.getElementById('meta-detected').textContent = '최종 감지: 확인 불가';
   document.getElementById('meta-status').textContent = '수집 상태: 확인 불가';
+  const lastSuccess = document.getElementById('meta-last-success');
+  if (lastSuccess) lastSuccess.textContent = '마지막 성공 수집: 확인 불가';
 });
