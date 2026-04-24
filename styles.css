@@ -13,7 +13,8 @@ h1 { margin: 0 0 8px; }
 .meta-line { margin: 2px 0; }
 .meta-toggle.open .meta { display: block; }
 .controls { display: grid; gap: 12px; align-items: start; }
-.controls-toggle { width: 100%; text-align: left; cursor: pointer; }
+.controls-toggle { width: 100%; text-align: left; }
+.controls-summary-button { width: 100%; text-align: left; cursor: pointer; padding: 0; border: 0; background: transparent; }
 .controls-compact { color: #e8eefc; font-size: 14px; font-weight: 600; }
 .controls-details { display: none; margin-top: 10px; }
 .controls-toggle.open .controls-details { display: grid; gap: 12px; }

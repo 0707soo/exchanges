@@ -419,10 +419,8 @@ async function load() {
     syncMetaVisibility();
   });
 
-  const controlsToggle = document.getElementById('controls-toggle');
-  controlsToggle.addEventListener('click', (event) => {
-    const interactive = event.target.closest('#periods button, #range-presets button, #date-prev, #date-next, #range-end-date');
-    if (interactive) return;
+  const controlsSummaryButton = document.getElementById('controls-summary-button');
+  controlsSummaryButton.addEventListener('click', () => {
     controlsOpen = !controlsOpen;
     syncControlsVisibility();
   });
@@ -451,9 +449,10 @@ function syncMetaVisibility() {
 
 function syncControlsVisibility() {
   const controlsToggle = document.getElementById('controls-toggle');
-  if (!controlsToggle) return;
+  const controlsSummaryButton = document.getElementById('controls-summary-button');
+  if (!controlsToggle || !controlsSummaryButton) return;
   controlsToggle.classList.toggle('open', controlsOpen);
-  controlsToggle.setAttribute('aria-expanded', String(controlsOpen));
+  controlsSummaryButton.setAttribute('aria-expanded', String(controlsOpen));
 }
 
 function render(code) {
