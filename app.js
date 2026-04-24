@@ -157,24 +157,39 @@ function updateSummary(points) {
   const high = document.getElementById('summary-high');
   const low = document.getElementById('summary-low');
   const range = document.getElementById('summary-range');
-  if (!current || !high || !low || !range) return;
+  const change = document.getElementById('summary-change');
+  const changePct = document.getElementById('summary-change-pct');
+  if (!current || !high || !low || !range || !change || !changePct) return;
 
   if (!points.length) {
     current.textContent = '-';
     high.textContent = '-';
     low.textContent = '-';
     range.textContent = '-';
+    change.textContent = '-';
+    changePct.textContent = '-';
     return;
   }
 
-  const values = points.map((point) => Number(point.v));
-  const currentValue = values[values.length - 1];
-  const highValue = Math.max(...values);
-  const lowValue = Math.min(...values);
+  let highValue = Number.NEGATIVE_INFINITY;
+  let lowValue = Number.POSITIVE_INFINITY;
+  const firstValue = Number(points[0].v);
+  let currentValue = firstValue;
+  for (const point of points) {
+    const value = Number(point.v);
+    if (value > highValue) highValue = value;
+    if (value < lowValue) lowValue = value;
+    currentValue = value;
+  }
+  const rangeValue = highValue - lowValue;
+  const changeValue = currentValue - firstValue;
+  const changePercent = firstValue ? (changeValue / firstValue) * 100 : 0;
   current.textContent = fmt(currentValue);
   high.textContent = fmt(highValue);
   low.textContent = fmt(lowValue);
-  range.textContent = fmt(highValue - lowValue);
+  range.textContent = fmt(rangeValue);
+  change.textContent = `${changeValue > 0 ? '+' : ''}${fmt(changeValue)}`;
+  changePct.textContent = `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
 }
 
 function renderFetchStatus() {
@@ -270,7 +285,6 @@ async function load() {
       const preset = btn.dataset.rangePreset;
       if (preset === 'today') currentEndDate = getTodayKstValue();
       if (preset === 'yesterday') currentEndDate = shiftDateInputValue(getTodayKstValue(), -1);
-      if (preset === 'latest') currentEndDate = latestDate;
       if (currentEndDate > latestDate) currentEndDate = latestDate;
       rangeEndInput.value = currentEndDate;
       render(currency.value);
@@ -315,8 +329,12 @@ function render(code) {
   const series = seriesByPeriod[currentPeriod] || {};
   const points = filterPoints(series[code] || [], currentPeriod);
   updateSummary(points);
-  const labels = points.map(p => toKstShort(p.t));
-  const values = points.map(p => p.v);
+  const labels = [];
+  const values = [];
+  for (const point of points) {
+    labels.push(toKstShort(point.t));
+    values.push(point.v);
+  }
 
   if (chart) chart.destroy();
   chart = new Chart(document.getElementById('chart'), {
