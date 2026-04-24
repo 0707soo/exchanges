@@ -7,6 +7,7 @@ let detailsOpen = false;
 let currentPeriod = '1d';
 let currentEndDate = null;
 let filteredCodes = [];
+let activePointIndex = null;
 const FIXED_FAVORITE_CODES = ['USD', 'JPY', 'CNY'];
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
@@ -147,7 +148,12 @@ function applyCurrencyFilter(allCodes, keyword) {
   return filteredCodes;
 }
 
-function renderRecentUpdates(code) {
+function moveCurrentDate(days, maxDate) {
+  currentEndDate = shiftDateInputValue(currentEndDate, days);
+  if (currentEndDate > maxDate) currentEndDate = maxDate;
+}
+
+function renderRecentUpdates(code, points = []) {
   const body = document.getElementById('recent-updates-body');
   const caption = document.getElementById('recent-updates-caption');
   if (!body || !caption) return;
@@ -184,6 +190,26 @@ function renderRecentUpdates(code) {
       </tr>
     `;
   }).join('');
+
+  body.querySelectorAll('tr[data-published]').forEach((rowEl) => {
+    rowEl.addEventListener('click', () => {
+      const publishedAt = rowEl.dataset.published;
+      if (!publishedAt || !points.length) return;
+      let nearestIndex = 0;
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      points.forEach((point, idx) => {
+        const distance = Math.abs(new Date(point.t).getTime() - new Date(publishedAt).getTime());
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = idx;
+        }
+      });
+      activePointIndex = nearestIndex;
+      body.querySelectorAll('tr').forEach((tr) => tr.classList.remove('is-selected'));
+      rowEl.classList.add('is-selected');
+      chart?.update();
+    });
+  });
 }
 
 async function loadStatus() {
@@ -321,6 +347,19 @@ async function load() {
     currentEndDate = rangeEndInput.value || getTodayKstValue();
     if (currentEndDate > latestDate) currentEndDate = latestDate;
     rangeEndInput.value = currentEndDate;
+    activePointIndex = null;
+    render(currency.value);
+  });
+  document.getElementById('date-prev').addEventListener('click', () => {
+    moveCurrentDate(-1, latestDate);
+    rangeEndInput.value = currentEndDate;
+    activePointIndex = null;
+    render(currency.value);
+  });
+  document.getElementById('date-next').addEventListener('click', () => {
+    moveCurrentDate(1, latestDate);
+    rangeEndInput.value = currentEndDate;
+    activePointIndex = null;
     render(currency.value);
   });
 
@@ -331,6 +370,7 @@ async function load() {
       if (preset === 'yesterday') currentEndDate = shiftDateInputValue(getTodayKstValue(), -1);
       if (currentEndDate > latestDate) currentEndDate = latestDate;
       rangeEndInput.value = currentEndDate;
+      activePointIndex = null;
       render(currency.value);
     });
   });
@@ -370,7 +410,6 @@ function render(code) {
   if (!row) return;
 
   renderFavoriteCodes(code);
-  renderRecentUpdates(code);
 
   document.getElementById('base').textContent = fmt(row.base_rate);
   document.getElementById('send').textContent = fmt(row.send);
@@ -378,6 +417,7 @@ function render(code) {
 
   const series = seriesByPeriod[currentPeriod] || {};
   const points = filterPoints(series[code] || [], currentPeriod);
+  renderRecentUpdates(code, points);
   updateSummary(points);
   const labels = [];
   const values = [];
@@ -397,7 +437,8 @@ function render(code) {
         borderColor: '#67b7ff',
         backgroundColor: 'rgba(103,183,255,0.2)',
         tension: 0.2,
-        pointRadius: 0,
+        pointRadius: (ctx) => ctx.dataIndex === activePointIndex ? 4 : 0,
+        pointHoverRadius: 5,
         fill: true,
       }]
     },
@@ -409,7 +450,20 @@ function render(code) {
         x: { ticks: { maxTicksLimit: 8, color: '#9fb0d0' }, grid: { color: '#1d2b49' } },
         y: { ticks: { color: '#9fb0d0' }, grid: { color: '#1d2b49' } },
       },
-      plugins: { legend: { labels: { color: '#e8eefc' } } }
+      plugins: {
+        legend: { labels: { color: '#e8eefc' } },
+        tooltip: {
+          backgroundColor: '#0f1728',
+          titleColor: '#e8eefc',
+          bodyColor: '#e8eefc',
+          padding: 12,
+          displayColors: false,
+          callbacks: {
+            title: (items) => items?.[0]?.label ? `시각 ${items[0].label}` : '',
+            label: (item) => `매매기준율 ${fmt(item.parsed.y)}`,
+          }
+        }
+      }
     }
   });
 }
