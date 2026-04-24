@@ -5,6 +5,7 @@ let seriesByPeriod = {};
 let chart;
 let detailsOpen = false;
 let metaOpen = false;
+let controlsOpen = false;
 let currentPeriod = '1d';
 let currentEndDate = null;
 let filteredCodes = [];
@@ -265,6 +266,16 @@ function updateMetaCompact() {
   compact.textContent = `고시 ${published} · 수집 ${statusText}`;
 }
 
+function updateControlsCompact() {
+  const compact = document.getElementById('controls-compact');
+  if (!compact) return;
+  const currency = document.getElementById('currency');
+  const code = currency?.value || '통화';
+  const periodLabel = currentPeriod === '1d' ? '1일' : currentPeriod === '7d' ? '1주' : '1개월';
+  const dateLabel = currentEndDate || '-';
+  compact.textContent = `${code} · ${periodLabel} · ${dateLabel}`;
+}
+
 function renderFetchStatus() {
   const statusLine = document.getElementById('meta-status');
   const banner = document.getElementById('status-banner');
@@ -394,6 +405,7 @@ async function load() {
   document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
   document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 로딩 중...';
   renderFetchStatus();
+  updateControlsCompact();
 
   const baseToggle = document.getElementById('base-toggle');
   baseToggle.addEventListener('click', () => {
@@ -407,9 +419,18 @@ async function load() {
     syncMetaVisibility();
   });
 
+  const controlsToggle = document.getElementById('controls-toggle');
+  controlsToggle.addEventListener('click', (event) => {
+    const interactive = event.target.closest('input, select, button[data-favorite-code], #periods button, #range-presets button, #date-prev, #date-next');
+    if (interactive) return;
+    controlsOpen = !controlsOpen;
+    syncControlsVisibility();
+  });
+
   window.addEventListener('resize', syncCardsVisibility);
   syncCardsVisibility();
   syncMetaVisibility();
+  syncControlsVisibility();
   render(currency.value);
 }
 
@@ -428,11 +449,19 @@ function syncMetaVisibility() {
   metaToggle.setAttribute('aria-expanded', String(metaOpen));
 }
 
+function syncControlsVisibility() {
+  const controlsToggle = document.getElementById('controls-toggle');
+  if (!controlsToggle) return;
+  controlsToggle.classList.toggle('open', controlsOpen);
+  controlsToggle.setAttribute('aria-expanded', String(controlsOpen));
+}
+
 function render(code) {
   const row = latest.rows[code];
   if (!row) return;
 
   renderFavoriteCodes(code);
+  updateControlsCompact();
 
   document.getElementById('base').textContent = fmt(row.base_rate);
 
