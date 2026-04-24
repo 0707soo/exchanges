@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260424-15" />
+    <link rel="stylesheet" href="styles.css?v=20260424-16" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -37,25 +37,20 @@
                 <button data-favorite-code="CNY" type="button">CNY</button>
               </div>
             </div>
-            <div class="control-group controls-group-collapsible" id="controls-toggle">
-              <button class="controls-summary-button" aria-expanded="false" aria-controls="controls-details" id="controls-summary-button" type="button">
-                <div class="controls-compact" id="controls-compact">로딩 중...</div>
-              </button>
-              <div class="controls-details" id="controls-details">
-                <div class="periods" id="periods">
-                  <button data-period="1d" class="active" type="button">1일</button>
-                  <button data-period="7d" type="button">1주</button>
-                  <button data-period="30d" type="button">1개월</button>
-                </div>
-                <div class="range-end">
-                  <button id="date-prev" type="button" aria-label="이전 날짜">◀</button>
-                  <input id="range-end-date" type="date" />
-                  <button id="date-next" type="button" aria-label="다음 날짜">▶</button>
-                </div>
-                <div class="range-presets" id="range-presets">
-                  <button data-range-preset="today" type="button">오늘</button>
-                  <button data-range-preset="yesterday" type="button">어제</button>
-                </div>
+            <div class="control-group">
+              <div class="periods" id="periods">
+                <button data-period="1d" class="active" type="button">1일</button>
+                <button data-period="7d" type="button">1주</button>
+                <button data-period="30d" type="button">1개월</button>
+              </div>
+              <div class="range-end">
+                <button id="date-prev" type="button" aria-label="이전 날짜">◀</button>
+                <input id="range-end-date" type="date" />
+                <button id="date-next" type="button" aria-label="다음 날짜">▶</button>
+              </div>
+              <div class="range-presets" id="range-presets">
+                <button data-range-preset="today" type="button">오늘</button>
+                <button data-range-preset="yesterday" type="button">어제</button>
               </div>
             </div>
           </section>
@@ -104,6 +99,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260424-15"></script>
+    <script src="app.js?v=20260424-16"></script>
   </body>
 </html>

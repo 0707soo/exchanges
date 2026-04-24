@@ -13,11 +13,6 @@ h1 { margin: 0 0 8px; }
 .meta-line { margin: 2px 0; }
 .meta-toggle.open .meta { display: block; }
 .controls { display: grid; gap: 12px; align-items: start; }
-.controls-toggle { width: 100%; text-align: left; }
-.controls-summary-button { width: 100%; text-align: left; cursor: pointer; padding: 0; border: 0; background: transparent; }
-.controls-compact { color: #e8eefc; font-size: 14px; font-weight: 600; }
-.controls-details { display: none; margin-top: 10px; }
-.controls-toggle.open .controls-details { display: grid; gap: 12px; }
 .control-group { display: grid; gap: 8px; padding: 10px; border: 1px solid #1d2b49; border-radius: 10px; background: rgba(18, 29, 49, 0.65); }
 .control-group-always { cursor: default; }
 .control-stack { display: grid; gap: 8px; }
@@ -85,8 +80,6 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
   .meta { font-size: 13px; }
   .meta-line { margin: 1px 0; }
   .controls { gap: 8px; }
-  .controls-compact { font-size: 13px; }
-  .controls-details { margin-top: 8px; }
   .control-group { gap: 7px; padding: 8px; }
   select, button, input[type="date"], input[type="search"] { padding: 7px 9px; font-size: 14px; }
   .quick, .periods, .range-presets { gap: 5px; }
