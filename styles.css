@@ -7,8 +7,11 @@ h1 { margin: 0 0 8px; }
 .dashboard { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 16px; align-items: start; margin-bottom: 16px; }
 .dashboard-sidebar { display: grid; gap: 14px; }
 .panel { background: #111a2d; border: 1px solid #2a3c61; border-radius: 12px; padding: 14px; }
-.meta { color: #9fb0d0; margin: 0; font-size: 14px; }
+.meta-toggle { display: grid; gap: 8px; width: 100%; text-align: left; cursor: pointer; }
+.meta-compact { color: #e8eefc; font-size: 14px; font-weight: 600; }
+.meta { color: #9fb0d0; margin: 0; font-size: 14px; display: none; }
 .meta-line { margin: 2px 0; }
+.meta-toggle.open .meta { display: block; }
 .controls { display: grid; gap: 12px; align-items: start; }
 .control-group { display: grid; gap: 8px; padding: 10px; border: 1px solid #1d2b49; border-radius: 10px; background: rgba(18, 29, 49, 0.65); }
 .control-stack { display: grid; gap: 8px; }
@@ -72,6 +75,7 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
   .status-banner { margin-bottom: 10px; padding: 10px 12px; font-size: 13px; }
   .dashboard-sidebar { gap: 10px; }
   .panel { padding: 10px; border-radius: 10px; }
+  .meta-compact { font-size: 13px; }
   .meta { font-size: 13px; }
   .meta-line { margin: 1px 0; }
   .controls { gap: 8px; }

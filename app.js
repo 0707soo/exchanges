@@ -4,6 +4,7 @@ let recentSnapshots = [];
 let seriesByPeriod = {};
 let chart;
 let detailsOpen = false;
+let metaOpen = false;
 let currentPeriod = '1d';
 let currentEndDate = null;
 let filteredCodes = [];
@@ -256,6 +257,14 @@ function updateSummary(points) {
   setTextAndClass(changePct, `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`, getDiffClass(changePercent).replace('value', 'pct'));
 }
 
+function updateMetaCompact() {
+  const compact = document.getElementById('meta-compact');
+  if (!compact) return;
+  const published = normalizeDateTimeText(latest?.published_text) || '-';
+  const statusText = fetchStatus?.last_attempt_success ? '정상' : (fetchStatus ? '실패' : '확인 불가');
+  compact.textContent = `고시 ${published} · 수집 ${statusText}`;
+}
+
 function renderFetchStatus() {
   const statusLine = document.getElementById('meta-status');
   const banner = document.getElementById('status-banner');
@@ -265,6 +274,7 @@ function renderFetchStatus() {
     statusLine.textContent = '수집 상태: 상태 파일 없음';
     document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 확인 불가';
     banner.hidden = true;
+    updateMetaCompact();
     return;
   }
 
@@ -281,6 +291,7 @@ function renderFetchStatus() {
     document.getElementById('meta-last-success').textContent = lastSuccessLine;
     banner.hidden = true;
     banner.classList.remove('ok');
+    updateMetaCompact();
     return;
   }
 
@@ -290,6 +301,7 @@ function renderFetchStatus() {
   banner.hidden = false;
   banner.classList.remove('ok');
   banner.textContent = `자동 수집 실패, 마지막 시도 ${attempted}, 연속 실패 ${streak}회, 누적 실패 ${total}회, 오류: ${error}`;
+  updateMetaCompact();
 }
 
 async function load() {
@@ -389,8 +401,15 @@ async function load() {
     syncCardsVisibility();
   });
 
+  const metaToggle = document.getElementById('meta-toggle');
+  metaToggle.addEventListener('click', () => {
+    metaOpen = !metaOpen;
+    syncMetaVisibility();
+  });
+
   window.addEventListener('resize', syncCardsVisibility);
   syncCardsVisibility();
+  syncMetaVisibility();
   render(currency.value);
 }
 
@@ -400,6 +419,13 @@ function syncCardsVisibility() {
   if (!cards || !baseToggle) return;
   cards.classList.toggle('open', detailsOpen);
   baseToggle.setAttribute('aria-expanded', String(detailsOpen));
+}
+
+function syncMetaVisibility() {
+  const metaToggle = document.getElementById('meta-toggle');
+  if (!metaToggle) return;
+  metaToggle.classList.toggle('open', metaOpen);
+  metaToggle.setAttribute('aria-expanded', String(metaOpen));
 }
 
 function render(code) {
