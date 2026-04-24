@@ -7,9 +7,7 @@ let detailsOpen = false;
 let currentPeriod = '1d';
 let currentEndDate = null;
 let filteredCodes = [];
-let favoriteCodes = [];
-
-const FAVORITES_STORAGE_KEY = 'exchange-favorite-codes';
+const FIXED_FAVORITE_CODES = ['USD', 'JPY', 'CNY'];
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
@@ -120,24 +118,11 @@ function setTextAndClass(el, text, className) {
   if (className) el.classList.add(className);
 }
 
-function loadFavoriteCodes(codes) {
-  try {
-    const saved = JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || '[]');
-    if (Array.isArray(saved)) return saved.filter((code) => codes.includes(code)).slice(0, 6);
-  } catch {}
-  return ['USD', 'JPY', 'CNY', 'EUR'].filter((code) => codes.includes(code));
-}
-
-function saveFavoriteCodes() {
-  try {
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteCodes.slice(0, 6)));
-  } catch {}
-}
-
 function renderFavoriteCodes(selectedCode) {
   const quick = document.getElementById('favorite-codes');
   if (!quick) return;
-  quick.innerHTML = favoriteCodes.map((code) => `
+  const visibleCodes = FIXED_FAVORITE_CODES.filter((code) => latest?.rows?.[code]);
+  quick.innerHTML = visibleCodes.map((code) => `
     <button data-favorite-code="${code}" class="${code === selectedCode ? 'active' : ''}" type="button">${code}</button>
   `).join('');
   quick.querySelectorAll('[data-favorite-code]').forEach((btn) => {
@@ -148,12 +133,6 @@ function renderFavoriteCodes(selectedCode) {
       render(code);
     });
   });
-}
-
-function updateFavoriteCodes(code) {
-  favoriteCodes = [code, ...favoriteCodes.filter((item) => item !== code)].slice(0, 6);
-  saveFavoriteCodes();
-  renderFavoriteCodes(code);
 }
 
 function applyCurrencyFilter(allCodes, keyword) {
@@ -308,7 +287,6 @@ async function load() {
 
   const currency = document.getElementById('currency');
   const codes = Object.keys(latest.rows).sort();
-  favoriteCodes = loadFavoriteCodes(codes);
   applyCurrencyFilter(codes, '');
   currency.value = codes.includes('USD') ? 'USD' : codes[0];
   currency.addEventListener('change', () => render(currency.value));
@@ -391,7 +369,7 @@ function render(code) {
   const row = latest.rows[code];
   if (!row) return;
 
-  updateFavoriteCodes(code);
+  renderFavoriteCodes(code);
   renderRecentUpdates(code);
 
   document.getElementById('base').textContent = fmt(row.base_rate);

@@ -29,8 +29,8 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .summary-card span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #9fb0d0; }
 .summary-card strong { display: block; font-size: 20px; letter-spacing: .2px; }
 .summary-card em { display: block; margin-top: 4px; font-style: normal; font-size: 12px; color: #9fb0d0; }
-.summary-card .value-up, .summary-card .pct-up { color: #7ee787; }
-.summary-card .value-down, .summary-card .pct-down { color: #ff9b9b; }
+.summary-card .value-up, .summary-card .pct-up { color: #ff8f8f; }
+.summary-card .value-down, .summary-card .pct-down { color: #7db8ff; }
 .summary-card .value-neutral, .summary-card .pct-neutral { color: #9fb0d0; }
 .hint-button { width: 18px; height: 18px; padding: 0; border-radius: 999px; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; color: #9fb0d0; }
 .hint-button:hover { border-color: #67b7ff; color: #67b7ff; }
@@ -46,8 +46,8 @@ canvas { width: 100%; height: 380px; }
 .recent-table th { color: #9fb0d0; font-weight: 600; }
 .recent-table tbody tr:last-child td { border-bottom: 0; }
 .recent-table tbody tr.is-latest td { background: rgba(103, 183, 255, 0.08); }
-.diff-up { color: #7ee787; }
-.diff-down { color: #ff9b9b; }
+.diff-up { color: #ff8f8f; }
+.diff-down { color: #7db8ff; }
 .diff-neutral { color: #9fb0d0; }
 @media (max-width: 720px) {
   .cards { grid-template-columns: 1fr; }

@@ -23,7 +23,11 @@
         <label for="currency">통화</label>
         <input id="currency-search" type="search" placeholder="통화 검색 (USD, 달러, 일본)" />
         <select id="currency"></select>
-        <div class="quick" id="favorite-codes"></div>
+        <div class="quick" id="favorite-codes">
+          <button data-favorite-code="USD" type="button">USD</button>
+          <button data-favorite-code="JPY" type="button">JPY</button>
+          <button data-favorite-code="CNY" type="button">CNY</button>
+        </div>
         <div class="periods" id="periods">
           <button data-period="1d" class="active" type="button">1일</button>
           <button data-period="7d" type="button">1주</button>
