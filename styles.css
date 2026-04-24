@@ -42,7 +42,7 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .hint-button { width: 18px; height: 18px; padding: 0; border-radius: 999px; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; color: #9fb0d0; }
 .hint-button:hover { border-color: #67b7ff; color: #67b7ff; }
 .chart { background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; }
-.chart-panel { min-height: 100%; overflow: hidden; }
+.chart-panel { overflow: hidden; }
 .chart-box { position: relative; height: 520px; }
 #chart { display: block; width: 100% !important; height: 100% !important; }
 .recent-updates { margin-top: 0; background: #111a2d; border: 1px solid #2a3c61; border-radius: 10px; padding: 12px; position: relative; z-index: 0; }
