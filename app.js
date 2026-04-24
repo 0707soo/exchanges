@@ -9,7 +9,11 @@ let currentPeriod = '1d';
 let currentEndDate = null;
 let filteredCodes = [];
 let activePointIndex = null;
+const urlParams = new URLSearchParams(window.location.search);
+const compareBetaEnabled = urlParams.get('beta') === 'compare';
+let compareCodes = ['USD', 'JPY', 'CNY'];
 const FIXED_FAVORITE_CODES = ['USD', 'JPY', 'CNY'];
+const COMPARE_COLORS = ['#67b7ff', '#ff8f8f', '#7ee0a1'];
 
 const fmt = (n) => Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 const toKst = (iso) => new Intl.DateTimeFormat('ko-KR', {
@@ -118,6 +122,38 @@ function setTextAndClass(el, text, className) {
   el.textContent = text;
   el.classList.remove('value-up', 'value-down', 'value-neutral', 'pct-up', 'pct-down', 'pct-neutral');
   if (className) el.classList.add(className);
+}
+
+function toggleCompareCode(code) {
+  if (compareCodes.includes(code)) {
+    if (compareCodes.length === 1) return;
+    compareCodes = compareCodes.filter((item) => item !== code);
+  } else {
+    if (compareCodes.length >= 3) return;
+    compareCodes = [...compareCodes, code];
+  }
+}
+
+function renderComparePanel() {
+  const panel = document.getElementById('beta-compare-panel');
+  const list = document.getElementById('beta-compare-list');
+  if (!panel || !list) return;
+  if (!compareBetaEnabled) {
+    panel.hidden = true;
+    return;
+  }
+  panel.hidden = false;
+  const codes = Object.keys(latest?.rows || {}).sort();
+  list.innerHTML = codes.map((code) => `
+    <button type="button" data-compare-code="${code}" class="${compareCodes.includes(code) ? 'active' : ''}">${code}</button>
+  `).join('');
+  list.querySelectorAll('[data-compare-code]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      toggleCompareCode(btn.dataset.compareCode);
+      renderComparePanel();
+      render(document.getElementById('currency').value);
+    });
+  });
 }
 
 function renderFavoriteCodes(selectedCode) {
@@ -337,6 +373,7 @@ async function load() {
   });
 
   renderFavoriteCodes(currency.value);
+  renderComparePanel();
 
   document.querySelectorAll('#periods [data-period]').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -428,6 +465,13 @@ function syncMetaVisibility() {
   metaToggle.setAttribute('aria-expanded', String(metaOpen));
 }
 
+function normalizeSeries(points) {
+  if (!points.length) return [];
+  const first = Number(points[0].v);
+  if (!first) return [];
+  return points.map((point) => ({ ...point, nv: (Number(point.v) / first) * 100 }));
+}
+
 function render(code) {
   const row = latest.rows[code];
   if (!row) return;
@@ -440,11 +484,38 @@ function render(code) {
   const points = filterPoints(series[code] || [], currentPeriod);
   renderRecentUpdates(code, points);
   updateSummary(points);
-  const labels = [];
-  const values = [];
-  for (const point of points) {
-    labels.push(toKstShort(point.t));
-    values.push(point.v);
+  let labels = [];
+  let datasets = [];
+
+  if (compareBetaEnabled) {
+    const activeCodes = compareCodes.filter((item) => series[item]?.length).slice(0, 3);
+    const normalizedGroups = activeCodes.map((item) => ({
+      code: item,
+      points: normalizeSeries(filterPoints(series[item] || [], currentPeriod)),
+    })).filter((group) => group.points.length);
+    labels = normalizedGroups[0]?.points.map((point) => toKstShort(point.t)) || [];
+    datasets = normalizedGroups.map((group, index) => ({
+      label: `${group.code} 움직임`,
+      data: group.points.map((point) => point.nv),
+      borderColor: COMPARE_COLORS[index % COMPARE_COLORS.length],
+      backgroundColor: 'transparent',
+      tension: 0.2,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      fill: false,
+    }));
+  } else {
+    labels = points.map((point) => toKstShort(point.t));
+    datasets = [{
+      label: `${code} 매매기준율`,
+      data: points.map((point) => point.v),
+      borderColor: '#67b7ff',
+      backgroundColor: 'rgba(103,183,255,0.2)',
+      tension: 0.2,
+      pointRadius: (ctx) => ctx.dataIndex === activePointIndex ? 4 : 0,
+      pointHoverRadius: 5,
+      fill: true,
+    }];
   }
 
   if (chart) chart.destroy();
@@ -452,16 +523,7 @@ function render(code) {
     type: 'line',
     data: {
       labels,
-      datasets: [{
-        label: `${code} 매매기준율`,
-        data: values,
-        borderColor: '#67b7ff',
-        backgroundColor: 'rgba(103,183,255,0.2)',
-        tension: 0.2,
-        pointRadius: (ctx) => ctx.dataIndex === activePointIndex ? 4 : 0,
-        pointHoverRadius: 5,
-        fill: true,
-      }]
+      datasets
     },
     options: {
       responsive: true,
@@ -481,7 +543,7 @@ function render(code) {
           displayColors: false,
           callbacks: {
             title: (items) => items?.[0]?.label ? `시각 ${items[0].label}` : '',
-            label: (item) => `매매기준율 ${fmt(item.parsed.y)}`,
+            label: (item) => compareBetaEnabled ? `${item.dataset.label} ${item.parsed.y.toFixed(2)}` : `매매기준율 ${fmt(item.parsed.y)}`,
           }
         }
       }

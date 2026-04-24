@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260424-16" />
+    <link rel="stylesheet" href="styles.css?v=20260424-17" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -53,6 +53,10 @@
                 <button data-range-preset="yesterday" type="button">어제</button>
               </div>
             </div>
+            <div class="control-group beta-compare" id="beta-compare-panel" hidden>
+              <div class="beta-compare-title">비교 모드 beta · 시작값 100 기준</div>
+              <div class="beta-compare-list" id="beta-compare-list"></div>
+            </div>
           </section>
 
           <section class="cards" id="cards">
@@ -99,6 +103,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260424-16"></script>
+    <script src="app.js?v=20260424-17"></script>
   </body>
 </html>
