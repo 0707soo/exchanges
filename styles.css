@@ -9,7 +9,10 @@ h1 { margin: 0 0 8px; }
 .panel { background: #111a2d; border: 1px solid #2a3c61; border-radius: 12px; padding: 14px; }
 .meta { color: #9fb0d0; margin: 0; font-size: 14px; }
 .meta-line { margin: 2px 0; }
-.controls { display: grid; gap: 10px; align-items: center; }
+.controls { display: grid; gap: 12px; align-items: start; }
+.control-group { display: grid; gap: 8px; padding: 10px; border: 1px solid #1d2b49; border-radius: 10px; background: rgba(18, 29, 49, 0.65); }
+.control-group label, .control-label { color: #9fb0d0; font-size: 13px; font-weight: 600; }
+.control-stack { display: grid; gap: 8px; }
 select, button, input[type="date"], input[type="search"] { background: #17233b; color: #e8eefc; border: 1px solid #2f446f; border-radius: 8px; padding: 8px 10px; }
 #currency-search { min-width: 220px; width: 100%; box-sizing: border-box; }
 #currency { width: 100%; }
@@ -17,7 +20,7 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
 .quick button.active { border-color: #67b7ff; color: #67b7ff; }
 .periods { display: flex; gap: 6px; flex-wrap: wrap; }
 .periods button.active { border-color: #67b7ff; color: #67b7ff; }
-.range-end { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.range-end { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
 .range-end label { color: #9fb0d0; font-size: 13px; }
 .range-end button { padding: 8px 9px; }
 .range-presets { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -73,10 +76,11 @@ select, button, input[type="date"], input[type="search"] { background: #17233b; 
   .meta { font-size: 13px; }
   .meta-line { margin: 1px 0; }
   .controls { gap: 8px; }
+  .control-group { gap: 7px; padding: 8px; }
   select, button, input[type="date"], input[type="search"] { padding: 7px 9px; font-size: 14px; }
   .quick, .periods, .range-presets { gap: 5px; }
   .range-end { gap: 6px; }
-  .range-end label { font-size: 12px; }
+  .control-group label, .control-label, .range-end label { font-size: 12px; }
   .cards { grid-template-columns: 1fr; gap: 8px; }
   .card { padding: 10px; }
   .card strong { font-size: 26px; }

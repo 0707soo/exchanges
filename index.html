@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
-    <link rel="stylesheet" href="styles.css?v=20260424-9" />
+    <link rel="stylesheet" href="styles.css?v=20260424-10" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -25,28 +25,37 @@
           </div>
 
           <section class="panel controls">
-            <label for="currency">통화</label>
-            <input id="currency-search" type="search" placeholder="통화 검색 (USD, 일본)" />
-            <select id="currency"></select>
-            <div class="quick" id="favorite-codes">
-              <button data-favorite-code="USD" type="button">USD</button>
-              <button data-favorite-code="JPY" type="button">JPY</button>
-              <button data-favorite-code="CNY" type="button">CNY</button>
+            <div class="control-group">
+              <label for="currency">통화</label>
+              <div class="control-stack">
+                <input id="currency-search" type="search" placeholder="통화 검색 (USD, 일본)" />
+                <select id="currency"></select>
+              </div>
+              <div class="quick" id="favorite-codes">
+                <button data-favorite-code="USD" type="button">USD</button>
+                <button data-favorite-code="JPY" type="button">JPY</button>
+                <button data-favorite-code="CNY" type="button">CNY</button>
+              </div>
             </div>
-            <div class="periods" id="periods">
-              <button data-period="1d" class="active" type="button">1일</button>
-              <button data-period="7d" type="button">1주</button>
-              <button data-period="30d" type="button">1개월</button>
+            <div class="control-group">
+              <span class="control-label">기간</span>
+              <div class="periods" id="periods">
+                <button data-period="1d" class="active" type="button">1일</button>
+                <button data-period="7d" type="button">1주</button>
+                <button data-period="30d" type="button">1개월</button>
+              </div>
             </div>
-            <div class="range-end">
-              <label for="range-end-date">기준 날짜</label>
-              <button id="date-prev" type="button" aria-label="이전 날짜">◀</button>
-              <input id="range-end-date" type="date" />
-              <button id="date-next" type="button" aria-label="다음 날짜">▶</button>
-            </div>
-            <div class="range-presets" id="range-presets">
-              <button data-range-preset="today" type="button">오늘</button>
-              <button data-range-preset="yesterday" type="button">어제</button>
+            <div class="control-group">
+              <span class="control-label">기준 날짜</span>
+              <div class="range-end">
+                <button id="date-prev" type="button" aria-label="이전 날짜">◀</button>
+                <input id="range-end-date" type="date" />
+                <button id="date-next" type="button" aria-label="다음 날짜">▶</button>
+              </div>
+              <div class="range-presets" id="range-presets">
+                <button data-range-preset="today" type="button">오늘</button>
+                <button data-range-preset="yesterday" type="button">어제</button>
+              </div>
             </div>
           </section>
 
@@ -94,6 +103,6 @@
         </div>
       </section>
     </main>
-    <script src="app.js?v=20260424-9"></script>
+    <script src="app.js?v=20260424-10"></script>
   </body>
 </html>
