@@ -14,6 +14,17 @@ const compareBetaEnabled = urlParams.get('beta') === 'compare';
 let compareCodes = ['USD', 'CNY', 'JPY', 'GBP', 'EUR'];
 const FIXED_FAVORITE_CODES = ['USD', 'JPY', 'CNY'];
 const COMPARE_COLORS = ['#67b7ff', '#ff8f8f', '#7ee0a1', '#f5c26b', '#d29bff'];
+const AUTO_REFRESH_INTERVAL_MS = 60 * 1000;
+let latestFingerprint = null;
+let autoRefreshTimer = null;
+let autoRefreshInFlight = false;
+
+const withCacheBust = (path) => `${path}${path.includes('?') ? '&' : '?'}_=${Date.now()}`;
+const getLatestFingerprint = (data) => [
+  data?.published_at_kst || '',
+  data?.sequence || '',
+  data?.captured_at_utc || '',
+].join('|');
 
 function applyModeVisibility() {
   document.body.classList.toggle('compare-mode', compareBetaEnabled);
@@ -113,7 +124,7 @@ function getHistoryMonthCandidates() {
 async function loadRecentSnapshots() {
   for (const month of getHistoryMonthCandidates()) {
     try {
-      const r = await fetch(`./data/history/${month}.ndjson`, { cache: 'no-store' });
+      const r = await fetch(withCacheBust(`./data/history/${month}.ndjson`), { cache: 'no-store' });
       if (!r.ok) continue;
       const text = await r.text();
       const rows = text.split('\n').map(line => line.trim()).filter(Boolean).map(line => JSON.parse(line));
@@ -261,7 +272,7 @@ function renderRecentUpdates(code, points = []) {
 
 async function loadStatus() {
   try {
-    const r = await fetch('./data/status.json', { cache: 'no-store' });
+    const r = await fetch(withCacheBust('./data/status.json'), { cache: 'no-store' });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return await r.json();
   } catch {
@@ -301,6 +312,12 @@ function updateSummary(points) {
   range.textContent = fmt(rangeValue);
   setTextAndClass(change, `${changeValue > 0 ? '+' : ''}${fmt(changeValue)}`, getDiffClass(changeValue));
   setTextAndClass(changePct, `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`, getDiffClass(changePercent).replace('value', 'pct'));
+}
+
+function renderMetaLines() {
+  document.getElementById('meta-published').textContent = `고시: ${normalizeDateTimeText(latest?.published_text) || '-'} (${latest?.sequence || '-'}회차)`;
+  document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${formatKstDateTime(latest?.captured_at_utc)}`;
+  document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
 }
 
 function updateMetaCompact() {
@@ -350,19 +367,32 @@ function renderFetchStatus() {
   updateMetaCompact();
 }
 
-async function load() {
+async function fetchSeries30d() {
+  return fetch(withCacheBust('./data/series-30d.json'), { cache: 'no-store' }).then(r => r.json());
+}
+
+function setSeriesForAllPeriods(series) {
+  seriesByPeriod['1d'] = series || {};
+  seriesByPeriod['7d'] = series || {};
+  seriesByPeriod['30d'] = series || {};
+}
+
+async function loadInitialData() {
   const [l, s, status] = await Promise.all([
-    fetch('./data/latest.json', { cache: 'no-store' }).then(r => r.json()),
-    fetch('./data/series-30d.json', { cache: 'no-store' }).then(r => r.json()),
+    fetch(withCacheBust('./data/latest.json'), { cache: 'no-store' }).then(r => r.json()),
+    fetchSeries30d(),
     loadStatus(),
   ]);
   latest = l;
+  latestFingerprint = getLatestFingerprint(latest);
   fetchStatus = status;
-  applyModeVisibility();
   recentSnapshots = await loadRecentSnapshots();
-  seriesByPeriod['1d'] = s.series || {};
-  seriesByPeriod['7d'] = s.series || {};
-  seriesByPeriod['30d'] = s.series || {};
+  setSeriesForAllPeriods(s.series || {});
+}
+
+async function load() {
+  await loadInitialData();
+  applyModeVisibility();
   const latestDate = getLatestPublishedDateValue();
   currentEndDate = getTodayKstValue();
   if (currentEndDate > latestDate) currentEndDate = latestDate;
@@ -404,19 +434,20 @@ async function load() {
   rangeEndInput.max = latestDate;
   rangeEndInput.addEventListener('change', () => {
     currentEndDate = rangeEndInput.value || getTodayKstValue();
-    if (currentEndDate > latestDate) currentEndDate = latestDate;
+    const currentLatestDate = getLatestPublishedDateValue();
+    if (currentEndDate > currentLatestDate) currentEndDate = currentLatestDate;
     rangeEndInput.value = currentEndDate;
     activePointIndex = null;
     render(currency.value);
   });
   document.getElementById('date-prev').addEventListener('click', () => {
-    moveCurrentDate(-1, latestDate);
+    moveCurrentDate(-1, getLatestPublishedDateValue());
     rangeEndInput.value = currentEndDate;
     activePointIndex = null;
     render(currency.value);
   });
   document.getElementById('date-next').addEventListener('click', () => {
-    moveCurrentDate(1, latestDate);
+    moveCurrentDate(1, getLatestPublishedDateValue());
     rangeEndInput.value = currentEndDate;
     activePointIndex = null;
     render(currency.value);
@@ -427,7 +458,8 @@ async function load() {
       const preset = btn.dataset.rangePreset;
       if (preset === 'today') currentEndDate = getTodayKstValue();
       if (preset === 'yesterday') currentEndDate = shiftDateInputValue(getTodayKstValue(), -1);
-      if (currentEndDate > latestDate) currentEndDate = latestDate;
+      const currentLatestDate = getLatestPublishedDateValue();
+      if (currentEndDate > currentLatestDate) currentEndDate = currentLatestDate;
       rangeEndInput.value = currentEndDate;
       activePointIndex = null;
       render(currency.value);
@@ -439,9 +471,7 @@ async function load() {
     btn.setAttribute('aria-label', btn.dataset.hint || '설명');
   });
 
-  document.getElementById('meta-published').textContent = `고시: ${normalizeDateTimeText(latest.published_text) || '-'} (${latest.sequence || '-'}회차)`;
-  document.getElementById('meta-collected').textContent = `수집(KST, UTC+9): ${formatKstDateTime(latest.captured_at_utc)}`;
-  document.getElementById('meta-detected').textContent = `최종 감지: ${formatDetectedTime()}`;
+  renderMetaLines();
   document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 로딩 중...';
   renderFetchStatus();
 
@@ -461,6 +491,69 @@ async function load() {
   syncCardsVisibility();
   syncMetaVisibility();
   render(currency.value);
+  startAutoRefresh();
+}
+
+async function refreshData(nextLatest) {
+  const previousLatestDate = getLatestPublishedDateValue();
+  const wasFollowingLatest = !currentEndDate || currentEndDate === previousLatestDate;
+  const currency = document.getElementById('currency');
+  const currencySearch = document.getElementById('currency-search');
+  const selectedCode = currency?.value || 'USD';
+  const keyword = currencySearch?.value || '';
+
+  const [seriesData, status] = await Promise.all([fetchSeries30d(), loadStatus()]);
+  latest = nextLatest;
+  fetchStatus = status;
+  recentSnapshots = await loadRecentSnapshots();
+  setSeriesForAllPeriods(seriesData.series || {});
+
+  const codes = Object.keys(latest.rows).sort();
+  compareCodes = compareCodes.filter((code) => codes.includes(code));
+  if (!compareCodes.length) compareCodes = codes.slice(0, 5);
+  const matches = applyCurrencyFilter(codes, keyword);
+  const nextCode = matches.includes(selectedCode) ? selectedCode : (matches.includes('USD') ? 'USD' : (matches[0] || codes[0]));
+  if (currency && nextCode) currency.value = nextCode;
+
+  const nextLatestDate = getLatestPublishedDateValue();
+  const rangeEndInput = document.getElementById('range-end-date');
+  if (rangeEndInput) rangeEndInput.max = nextLatestDate;
+  if (wasFollowingLatest || currentEndDate > nextLatestDate) currentEndDate = nextLatestDate;
+  if (rangeEndInput) rangeEndInput.value = currentEndDate;
+
+  activePointIndex = null;
+  renderMetaLines();
+  renderFetchStatus();
+  renderComparePanel();
+  if (nextCode) render(nextCode);
+  latestFingerprint = getLatestFingerprint(latest);
+}
+
+async function checkForDataUpdate() {
+  if (autoRefreshInFlight) return;
+  autoRefreshInFlight = true;
+  try {
+    const r = await fetch(withCacheBust('./data/latest.json'), { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const nextLatest = await r.json();
+    const nextFingerprint = getLatestFingerprint(nextLatest);
+    if (latestFingerprint && nextFingerprint && nextFingerprint !== latestFingerprint) {
+      await refreshData(nextLatest);
+    }
+  } catch (err) {
+    console.warn('자동 갱신 확인 실패', err);
+  } finally {
+    autoRefreshInFlight = false;
+  }
+}
+
+function startAutoRefresh() {
+  if (autoRefreshTimer) return;
+  autoRefreshTimer = window.setInterval(checkForDataUpdate, AUTO_REFRESH_INTERVAL_MS);
+  window.addEventListener('focus', checkForDataUpdate);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) checkForDataUpdate();
+  });
 }
 
 function syncCardsVisibility() {
@@ -576,7 +669,7 @@ function render(code) {
 
 async function ensureSeries(period) {
   if (seriesByPeriod[period]) return;
-  const data = await fetch('./data/series-30d.json', { cache: 'no-store' }).then(r => r.json());
+  const data = await fetchSeries30d();
   seriesByPeriod[period] = data.series || {};
 }
 
