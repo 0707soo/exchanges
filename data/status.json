@@ -2,11 +2,11 @@
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-04-28T23:24:14.656290+00:00",
-  "window_ended_at_utc": "2026-04-28T23:28:38.843588+00:00",
+  "window_started_at_utc": "2026-04-28T23:30:37.755279+00:00",
+  "window_ended_at_utc": "2026-04-28T23:35:02.290158+00:00",
   "attempt_count": 3,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-04-28T23:28:29.344855+00:00",
+  "last_attempt_at_utc": "2026-04-28T23:34:56.516426+00:00",
   "last_attempt_success": true,
   "last_error": null,
   "last_log_excerpt": [
@@ -14,27 +14,27 @@
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-04-28T23:24:14.656301+00:00",
+      "attempted_at_utc": "2026-04-28T23:30:37.755289+00:00",
       "exit_code": 0,
       "changed": false,
-      "sequence_before": 1099,
-      "sequence_after": 1099,
-      "log_excerpt": [
-        "rows=58 changed=False sequence=1099"
-      ]
-    },
-    {
-      "attempted_at_utc": "2026-04-28T23:26:23.908366+00:00",
-      "exit_code": 0,
-      "changed": true,
-      "sequence_before": 1099,
+      "sequence_before": 2,
       "sequence_after": 2,
       "log_excerpt": [
-        "rows=58 changed=True sequence=2"
+        "rows=58 changed=False sequence=2"
       ]
     },
     {
-      "attempted_at_utc": "2026-04-28T23:28:29.344855+00:00",
+      "attempted_at_utc": "2026-04-28T23:32:49.974795+00:00",
+      "exit_code": 0,
+      "changed": false,
+      "sequence_before": 2,
+      "sequence_after": 2,
+      "log_excerpt": [
+        "rows=58 changed=False sequence=2"
+      ]
+    },
+    {
+      "attempted_at_utc": "2026-04-28T23:34:56.516426+00:00",
       "exit_code": 0,
       "changed": false,
       "sequence_before": 2,
@@ -45,7 +45,7 @@
     }
   ],
   "latest_published_at_kst": "2026-04-29T08:26:00+09:00",
-  "latest_captured_at_utc": "2026-04-28T23:28:29.437877+00:00",
+  "latest_captured_at_utc": "2026-04-28T23:34:56.635431+00:00",
   "latest_sequence": 2,
   "failure_streak": 0,
   "total_failures": 0,
