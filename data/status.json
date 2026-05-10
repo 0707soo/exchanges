@@ -2,11 +2,11 @@
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-05-10T05:31:08.297646+00:00",
-  "window_ended_at_utc": "2026-05-10T05:35:53.173078+00:00",
+  "window_started_at_utc": "2026-05-10T05:39:10.983387+00:00",
+  "window_ended_at_utc": "2026-05-10T05:43:31.798768+00:00",
   "attempt_count": 3,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-05-10T05:35:46.224244+00:00",
+  "last_attempt_at_utc": "2026-05-10T05:43:24.697581+00:00",
   "last_attempt_success": true,
   "last_error": null,
   "last_log_excerpt": [
@@ -14,7 +14,7 @@
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-05-10T05:31:08.297656+00:00",
+      "attempted_at_utc": "2026-05-10T05:39:10.983396+00:00",
       "exit_code": 0,
       "changed": false,
       "sequence_before": 1105,
@@ -24,21 +24,17 @@
       ]
     },
     {
-      "attempted_at_utc": "2026-05-10T05:33:14.352308+00:00",
-      "exit_code": 1,
+      "attempted_at_utc": "2026-05-10T05:41:17.905145+00:00",
+      "exit_code": 0,
       "changed": false,
       "sequence_before": 1105,
       "sequence_after": 1105,
       "log_excerpt": [
-        "    html = fetch_html(now_kst)",
-        "           ^^^^^^^^^^^^^^^^^^^",
-        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
-        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-        "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+        "rows=58 changed=False sequence=1105"
       ]
     },
     {
-      "attempted_at_utc": "2026-05-10T05:35:46.224244+00:00",
+      "attempted_at_utc": "2026-05-10T05:43:24.697581+00:00",
       "exit_code": 0,
       "changed": false,
       "sequence_before": 1105,
@@ -49,7 +45,7 @@
     }
   ],
   "latest_published_at_kst": "2026-05-08T22:06:00+09:00",
-  "latest_captured_at_utc": "2026-05-10T05:35:46.346942+00:00",
+  "latest_captured_at_utc": "2026-05-10T05:43:24.818071+00:00",
   "latest_sequence": 1105,
   "failure_streak": 0,
   "total_failures": 0,
