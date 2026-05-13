@@ -2,51 +2,51 @@
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-05-13T00:20:50.837581+00:00",
-  "window_ended_at_utc": "2026-05-13T00:25:35.462397+00:00",
+  "window_started_at_utc": "2026-05-13T00:29:18.073137+00:00",
+  "window_ended_at_utc": "2026-05-13T00:33:36.772501+00:00",
   "attempt_count": 3,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-05-13T00:25:29.649228+00:00",
+  "last_attempt_at_utc": "2026-05-13T00:33:29.481862+00:00",
   "last_attempt_success": true,
   "last_error": null,
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=49"
+    "rows=58 changed=True sequence=57"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-05-13T00:20:50.837587+00:00",
+      "attempted_at_utc": "2026-05-13T00:29:18.073144+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 38,
-      "sequence_after": 42,
+      "sequence_before": 49,
+      "sequence_after": 53,
       "log_excerpt": [
-        "rows=58 changed=True sequence=42"
+        "rows=58 changed=True sequence=53"
       ]
     },
     {
-      "attempted_at_utc": "2026-05-13T00:23:07.882295+00:00",
+      "attempted_at_utc": "2026-05-13T00:31:24.257843+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 42,
-      "sequence_after": 44,
+      "sequence_before": 53,
+      "sequence_after": 55,
       "log_excerpt": [
-        "rows=58 changed=True sequence=44"
+        "rows=58 changed=True sequence=55"
       ]
     },
     {
-      "attempted_at_utc": "2026-05-13T00:25:29.649228+00:00",
+      "attempted_at_utc": "2026-05-13T00:33:29.481862+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 44,
-      "sequence_after": 49,
+      "sequence_before": 55,
+      "sequence_after": 57,
       "log_excerpt": [
-        "rows=58 changed=True sequence=49"
+        "rows=58 changed=True sequence=57"
       ]
     }
   ],
-  "latest_published_at_kst": "2026-05-13T09:25:00+09:00",
-  "latest_captured_at_utc": "2026-05-13T00:25:29.771121+00:00",
-  "latest_sequence": 49,
+  "latest_published_at_kst": "2026-05-13T09:33:00+09:00",
+  "latest_captured_at_utc": "2026-05-13T00:33:29.603681+00:00",
+  "latest_sequence": 57,
   "failure_streak": 0,
   "total_failures": 0,
   "chain_allowed_now": true,
