@@ -1,20 +1,26 @@
 [
   {
-    "attempted_at_utc": "2026-05-16T12:45:38.589629+00:00",
-    "exit_code": 1,
+    "attempted_at_utc": "2026-05-16T12:54:24.823446+00:00",
+    "exit_code": 0,
     "changed": false,
     "sequence_before": 1298,
     "sequence_after": 1298,
     "log_excerpt": [
-      "    html = fetch_html(now_kst)",
-      "           ^^^^^^^^^^^^^^^^^^^",
-      "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
-      "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-      "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+      "rows=58 changed=False sequence=1298"
     ]
   },
   {
-    "attempted_at_utc": "2026-05-16T12:48:11.513824+00:00",
+    "attempted_at_utc": "2026-05-16T12:56:30.551859+00:00",
+    "exit_code": 0,
+    "changed": false,
+    "sequence_before": 1298,
+    "sequence_after": 1298,
+    "log_excerpt": [
+      "rows=58 changed=False sequence=1298"
+    ]
+  },
+  {
+    "attempted_at_utc": "2026-05-16T12:58:35.396912+00:00",
     "exit_code": 0,
     "changed": false,
     "sequence_before": 1298,
