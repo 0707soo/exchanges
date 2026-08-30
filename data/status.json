@@ -1,52 +1,32 @@
 {
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
-  "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-05-26T06:30:37.840555+00:00",
-  "window_ended_at_utc": "2026-05-26T06:34:53.420996+00:00",
-  "attempt_count": 3,
+  "trigger_reason": "manual-recovery",
+  "window_started_at_utc": "2026-08-30T12:01:56.842739+00:00",
+  "window_ended_at_utc": "2026-08-30T12:02:04.259045+00:00",
+  "attempt_count": 1,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-05-26T06:34:48.299513+00:00",
+  "last_attempt_at_utc": "2026-08-30T12:01:56.842748+00:00",
   "last_attempt_success": true,
   "last_error": null,
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=380"
+    "rows=58 changed=True sequence=1155"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-05-26T06:30:37.840562+00:00",
+      "attempted_at_utc": "2026-08-30T12:01:56.842748+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 369,
-      "sequence_after": 374,
+      "sequence_before": 568,
+      "sequence_after": 1155,
       "log_excerpt": [
-        "rows=58 changed=True sequence=374"
-      ]
-    },
-    {
-      "attempted_at_utc": "2026-05-26T06:32:43.272631+00:00",
-      "exit_code": 0,
-      "changed": true,
-      "sequence_before": 374,
-      "sequence_after": 377,
-      "log_excerpt": [
-        "rows=58 changed=True sequence=377"
-      ]
-    },
-    {
-      "attempted_at_utc": "2026-05-26T06:34:48.299513+00:00",
-      "exit_code": 0,
-      "changed": true,
-      "sequence_before": 377,
-      "sequence_after": 380,
-      "log_excerpt": [
-        "rows=58 changed=True sequence=380"
+        "rows=58 changed=True sequence=1155"
       ]
     }
   ],
-  "latest_published_at_kst": "2026-05-26T15:33:00+09:00",
-  "latest_captured_at_utc": "2026-05-26T06:34:48.394554+00:00",
-  "latest_sequence": 380,
+  "latest_published_at_kst": "2026-08-28T21:09:00+09:00",
+  "latest_captured_at_utc": "2026-08-30T12:01:56.961466+00:00",
+  "latest_sequence": 1155,
   "failure_streak": 0,
   "total_failures": 0,
   "chain_allowed_now": true,
