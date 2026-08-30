@@ -25,7 +25,9 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    # fetch_rates.py already performs bounded upstream retries (up to ~5 min).
+    # Keep enough room for one complete collection plus validation and push.
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,8 +62,10 @@ jobs:
           fetch_log_path = root / 'fetch.log'
 
           started_at = datetime.now(timezone.utc)
-          attempts = 3
-          interval_seconds = 120
+          # The fetcher itself has bounded retries. Re-running the whole fetcher
+          # here multiplied the retry budget and exceeded the old job timeout.
+          attempts = 1
+          interval_seconds = 0
           pushed_count = 0
           any_success = False
           last_error = None
@@ -150,7 +154,7 @@ jobs:
           TRIGGER_REASON: ${{ inputs.trigger_reason || 'manual' }}
 
       - name: Commit all exchange updates
-        if: always()
+        if: steps.poll.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
