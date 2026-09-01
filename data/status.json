@@ -2,40 +2,32 @@
   "source": "hanabank",
   "poll_mode": "self-dispatch-chain-with-120-second-burst-and-batched-push",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-09-01T16:53:11.051625+00:00",
-  "window_ended_at_utc": "2026-09-01T16:53:42.159295+00:00",
+  "window_started_at_utc": "2026-09-01T16:57:25.307034+00:00",
+  "window_ended_at_utc": "2026-09-01T16:57:40.001266+00:00",
   "attempt_count": 1,
   "push_count": 0,
-  "last_attempt_at_utc": "2026-09-01T16:53:11.051635+00:00",
-  "last_attempt_success": false,
-  "last_error": "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+  "last_attempt_at_utc": "2026-09-01T16:57:25.307042+00:00",
+  "last_attempt_success": true,
+  "last_error": null,
   "last_log_excerpt": [
-    "    html = fetch_html(now_kst)",
-    "           ^^^^^^^^^^^^^^^^^^^",
-    "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
-    "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-    "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    "rows=58 changed=True sequence=945"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-09-01T16:53:11.051635+00:00",
-      "exit_code": 1,
-      "changed": false,
+      "attempted_at_utc": "2026-09-01T16:57:25.307042+00:00",
+      "exit_code": 0,
+      "changed": true,
       "sequence_before": 937,
-      "sequence_after": 937,
+      "sequence_after": 945,
       "log_excerpt": [
-        "    html = fetch_html(now_kst)",
-        "           ^^^^^^^^^^^^^^^^^^^",
-        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
-        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-        "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+        "rows=58 changed=True sequence=945"
       ]
     }
   ],
   "latest_published_at_kst": "2026-09-01T21:05:00+09:00",
-  "latest_captured_at_utc": "2026-09-01T16:47:46.224309+00:00",
-  "latest_sequence": 937,
-  "failure_streak": 1,
+  "latest_captured_at_utc": "2026-09-01T16:57:25.614473+00:00",
+  "latest_sequence": 945,
+  "failure_streak": 0,
   "total_failures": 27,
   "chain_allowed_now": true,
   "chain_timezone": "Asia/Seoul",
