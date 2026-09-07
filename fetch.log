@@ -1,16 +1,12 @@
 [
   {
-    "attempted_at_utc": "2026-09-07T22:19:12.973567+00:00",
-    "exit_code": 1,
-    "changed": false,
+    "attempted_at_utc": "2026-09-07T22:26:59.206802+00:00",
+    "exit_code": 0,
+    "changed": true,
     "sequence_before": 1531,
-    "sequence_after": 1531,
+    "sequence_after": 1532,
     "log_excerpt": [
-      "    html = fetch_html(now_kst)",
-      "           ^^^^^^^^^^^^^^^^^^^",
-      "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 148, in fetch_html",
-      "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-      "RuntimeError: 환율 수집 실패: HTTPSConnectionPool(host='hanabank.com', port=443): Max retries exceeded with url: /cont/mall/mall15/mall1501/index.jsp (Caused by ConnectTimeoutError(<HTTPSConnection(host='hanabank.com', port=443) at 0x7f8584e17f10>, 'Connection to hanabank.com timed out. (connect timeout=30)'))"
+      "rows=58 changed=True sequence=1532"
     ]
   }
 ]
