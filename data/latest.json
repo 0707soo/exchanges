@@ -1,32 +1,32 @@
 {
   "source": "https://hanabank.com/cont/mall/mall15/mall1501/index.jsp",
-  "captured_at_utc": "2026-09-07T22:52:25.464952+00:00",
+  "captured_at_utc": "2026-09-07T22:58:32.007454+00:00",
   "basis_date_text": "2026년09월07일",
   "published_text": "2026년09월07일 21시10분00초",
   "published_at_kst": "2026-09-07T21:10:00+09:00",
-  "sequence": 1533,
-  "viewed_text": "2026년09월08일 07시52분27초",
+  "sequence": 1534,
+  "viewed_text": "2026년09월08일 07시58분37초",
   "rates": {
     "USD": 1347.0,
     "JPY": 873.68,
-    "EUR": 1566.02,
+    "EUR": 1565.95,
     "CNY": 200.76,
     "HKD": 171.82,
-    "THB": 40.98,
+    "THB": 40.96,
     "TWD": 42.73,
     "PHP": 21.52,
     "SGD": 1064.07,
-    "AUD": 972.47,
+    "AUD": 972.4,
     "VND": 5.19,
-    "GBP": 1824.31,
+    "GBP": 1824.17,
     "CAD": 975.2,
     "MYR": 332.92,
     "RUB": 15.67,
-    "ZAR": 84.21,
+    "ZAR": 84.2,
     "NOK": 145.32,
-    "NZD": 791.83,
+    "NZD": 792.04,
     "DKK": 209.5,
-    "MXN": 79.56,
+    "MXN": 79.53,
     "MNT": 0.37,
     "BHD": 3572.57,
     "BDT": 10.97,
@@ -34,8 +34,8 @@
     "BND": 1064.07,
     "SAR": 358.69,
     "LKR": 4.1,
-    "SEK": 140.37,
-    "CHF": 1664.61,
+    "SEK": 140.38,
+    "CHF": 1664.4,
     "AED": 366.76,
     "DZD": 10.11,
     "OMR": 3498.61,
@@ -44,7 +44,7 @@
     "EGP": 26.45,
     "INR": 14.26,
     "IDR": 7.65,
-    "CZK": 64.72,
+    "CZK": 64.73,
     "CLP": 1.44,
     "KZT": 2.97,
     "QAR": 369.52,
@@ -54,14 +54,14 @@
     "TZS": 0.51,
     "TRY": 27.8,
     "PKR": 4.85,
-    "PLN": 363.34,
+    "PLN": 363.33,
     "HUF": 4.31,
     "NPR": 8.91,
     "MOP": 166.71,
     "KHR": 0.33,
     "FJD": 614.3,
     "LYD": 212.27,
-    "RON": 298.3,
+    "RON": 298.29,
     "MMK": 0.64,
     "ETB": 8.35,
     "UZS": 0.11
@@ -90,12 +90,12 @@
     "EUR": {
       "country": "유로",
       "unit_label": null,
-      "cash_buy": 1597.18,
-      "cash_sell": 1534.86,
-      "send": 1581.68,
-      "receive": 1550.36,
-      "base_rate": 1566.02,
-      "usd_rate": 1.1626
+      "cash_buy": 1597.11,
+      "cash_sell": 1534.79,
+      "send": 1581.6,
+      "receive": 1550.3,
+      "base_rate": 1565.95,
+      "usd_rate": 1.1625
     },
     "CNY": {
       "country": "중국",
@@ -120,11 +120,11 @@
     "THB": {
       "country": "태국",
       "unit_label": null,
-      "cash_buy": 43.02,
-      "cash_sell": 38.53,
-      "send": 41.38,
-      "receive": 40.58,
-      "base_rate": 40.98,
+      "cash_buy": 43.0,
+      "cash_sell": 38.51,
+      "send": 41.36,
+      "receive": 40.56,
+      "base_rate": 40.96,
       "usd_rate": 0.0304
     },
     "TWD": {
@@ -160,12 +160,12 @@
     "AUD": {
       "country": "호주",
       "unit_label": null,
-      "cash_buy": 991.62,
-      "cash_sell": 953.32,
-      "send": 982.19,
-      "receive": 962.75,
-      "base_rate": 972.47,
-      "usd_rate": 0.722
+      "cash_buy": 991.55,
+      "cash_sell": 953.25,
+      "send": 982.12,
+      "receive": 962.68,
+      "base_rate": 972.4,
+      "usd_rate": 0.7219
     },
     "VND": {
       "country": "베트남",
@@ -180,12 +180,12 @@
     "GBP": {
       "country": "영국",
       "unit_label": null,
-      "cash_buy": 1860.24,
-      "cash_sell": 1788.38,
-      "send": 1842.55,
-      "receive": 1806.07,
-      "base_rate": 1824.31,
-      "usd_rate": 1.3544
+      "cash_buy": 1860.1,
+      "cash_sell": 1788.24,
+      "send": 1842.41,
+      "receive": 1805.93,
+      "base_rate": 1824.17,
+      "usd_rate": 1.3542
     },
     "CAD": {
       "country": "캐나다",
@@ -220,11 +220,11 @@
     "ZAR": {
       "country": "남아공화국",
       "unit_label": null,
-      "cash_buy": 90.94,
-      "cash_sell": 77.48,
-      "send": 85.22,
-      "receive": 83.2,
-      "base_rate": 84.21,
+      "cash_buy": 90.93,
+      "cash_sell": 77.47,
+      "send": 85.21,
+      "receive": 83.19,
+      "base_rate": 84.2,
       "usd_rate": 0.0625
     },
     "NOK": {
@@ -240,12 +240,12 @@
     "NZD": {
       "country": "뉴질랜드",
       "unit_label": null,
-      "cash_buy": 807.42,
-      "cash_sell": 776.24,
-      "send": 799.74,
-      "receive": 783.92,
-      "base_rate": 791.83,
-      "usd_rate": 0.5878
+      "cash_buy": 807.64,
+      "cash_sell": 776.44,
+      "send": 799.96,
+      "receive": 784.12,
+      "base_rate": 792.04,
+      "usd_rate": 0.588
     },
     "DKK": {
       "country": "덴마크",
@@ -260,12 +260,12 @@
     "MXN": {
       "country": "멕시코",
       "unit_label": null,
-      "cash_buy": 87.91,
-      "cash_sell": 71.21,
-      "send": 80.35,
-      "receive": 78.77,
-      "base_rate": 79.56,
-      "usd_rate": 0.0591
+      "cash_buy": 87.88,
+      "cash_sell": 71.18,
+      "send": 80.32,
+      "receive": 78.74,
+      "base_rate": 79.53,
+      "usd_rate": 0.059
     },
     "MNT": {
       "country": "몽골",
@@ -342,20 +342,20 @@
       "unit_label": null,
       "cash_buy": 0.0,
       "cash_sell": 0.0,
-      "send": 141.77,
-      "receive": 138.97,
-      "base_rate": 140.37,
+      "send": 141.78,
+      "receive": 138.98,
+      "base_rate": 140.38,
       "usd_rate": 0.1042
     },
     "CHF": {
       "country": "스위스",
       "unit_label": null,
-      "cash_buy": 1697.4,
-      "cash_sell": 1631.82,
-      "send": 1681.25,
-      "receive": 1647.97,
-      "base_rate": 1664.61,
-      "usd_rate": 1.2358
+      "cash_buy": 1697.18,
+      "cash_sell": 1631.62,
+      "send": 1681.04,
+      "receive": 1647.76,
+      "base_rate": 1664.4,
+      "usd_rate": 1.2356
     },
     "AED": {
       "country": "아랍에미리트공화국",
@@ -440,12 +440,12 @@
     "CZK": {
       "country": "체코",
       "unit_label": null,
-      "cash_buy": 70.22,
-      "cash_sell": 58.9,
-      "send": 65.43,
-      "receive": 64.01,
-      "base_rate": 64.72,
-      "usd_rate": 0.048
+      "cash_buy": 70.23,
+      "cash_sell": 58.91,
+      "send": 65.44,
+      "receive": 64.02,
+      "base_rate": 64.73,
+      "usd_rate": 0.0481
     },
     "CLP": {
       "country": "칠레",
@@ -540,11 +540,11 @@
     "PLN": {
       "country": "폴란드",
       "unit_label": null,
-      "cash_buy": 392.4,
-      "cash_sell": 334.28,
-      "send": 367.33,
-      "receive": 359.35,
-      "base_rate": 363.34,
+      "cash_buy": 392.39,
+      "cash_sell": 334.27,
+      "send": 367.32,
+      "receive": 359.34,
+      "base_rate": 363.33,
       "usd_rate": 0.2697
     },
     "HUF": {
@@ -612,10 +612,10 @@
       "unit_label": null,
       "cash_buy": 0.0,
       "cash_sell": 0.0,
-      "send": 301.58,
-      "receive": 295.02,
-      "base_rate": 298.3,
-      "usd_rate": 0.2215
+      "send": 301.57,
+      "receive": 295.01,
+      "base_rate": 298.29,
+      "usd_rate": 0.2214
     },
     "MMK": {
       "country": "미얀마",
