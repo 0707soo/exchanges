@@ -108,7 +108,7 @@ class CollectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             fetcher.atomic_json(path, {"bad": float("nan")})
         self.assertEqual(json.loads(path.read_text()), {"good": True})
-        self.assertEqual([p.name for p in self.data.iterdir()], ["history", "latest.json"])
+        self.assertEqual({p.name for p in self.data.iterdir()}, {"history", "latest.json"})
 
     def test_history_is_idempotent_and_reverse_reader_handles_large_utf8_lines(self):
         s = snapshot()
