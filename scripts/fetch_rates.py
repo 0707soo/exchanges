@@ -126,7 +126,7 @@ def fetch_html(target_date: datetime, *, first: bool = False) -> str:
     }
 
     last_error: Exception | None = None
-    attempts = 1 if first else 3
+    attempts = 3
     timeout = (5, 10) if first else (5, 20)
     for i in range(attempts):
         try:
