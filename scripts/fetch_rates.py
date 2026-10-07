@@ -126,14 +126,17 @@ def fetch_html(target_date: datetime, *, first: bool = False) -> str:
     }
 
     last_error: Exception | None = None
-    for i in range(3):
+    attempts = 1 if first else 3
+    timeout = (5, 10) if first else (5, 20)
+    for i in range(attempts):
         try:
             with requests.Session() as s:
                 s.headers.update({"User-Agent": "Mozilla/5.0"})
-                page = s.get(SOURCE_PAGE, timeout=(5, 20))
+                page = s.get(SOURCE_PAGE, timeout=timeout)
                 page.raise_for_status()
-                for headers in ({}, {"Referer": SOURCE_PAGE}):
-                    response = s.post(DATA_ENDPOINT, data=payload, headers=headers, timeout=(5, 20))
+                header_options = ({"Referer": SOURCE_PAGE},) if first else ({}, {"Referer": SOURCE_PAGE})
+                for headers in header_options:
+                    response = s.post(DATA_ENDPOINT, data=payload, headers=headers, timeout=timeout)
                     response.raise_for_status()
                     if "tblBasic" in response.text:
                         return response.text
@@ -144,7 +147,7 @@ def fetch_html(target_date: datetime, *, first: bool = False) -> str:
             last_error = e
         except requests.RequestException as e:
             last_error = e
-        if i < 2:
+        if i < attempts - 1:
             time.sleep(2 ** (i + 1))
 
     raise RuntimeError(f"환율 수집 실패: {last_error}")
