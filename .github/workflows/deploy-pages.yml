@@ -35,7 +35,7 @@ jobs:
       - name: Stage public assets
         run: |
           mkdir -p _site/data
-          cp index.html app.js status-health.js styles.css _site/
+          cp index.html app.js status-health.js rate-baseline.js styles.css _site/
           cp data/*.json _site/data/
 
       - name: Upload Pages artifact

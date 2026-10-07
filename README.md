@@ -33,6 +33,7 @@ python3 scripts/fetch_rates.py
 - JSON 파일은 임시 파일에 저장한 뒤 교체합니다. 수집 실패 시 마지막 성공 시각을 보존하고 상태와 로그를 기록합니다.
 - 차트는 이력의 최근 3,000개 스냅샷에서 생성합니다. 월별 원본 이력은 저장소에 계속 보존합니다.
 - 화면의 최근 이력은 경량 파일인 `data/recent.json`을 사용합니다. Pages에는 정적 화면과 JSON만 배포합니다.
+- 최근 변동의 ‘최초 대비’는 각 고시 날짜의 하나은행 1회차 매매기준율과 비교합니다. `data/daily-first.json`에 검증된 최초 고시를 별도로 보존하므로 표시 건수와 관계없습니다. 같은 날짜의 1회차를 확인하지 못하면 `-`로 표시합니다.
 - 마지막 시도가 30분 이상 지연되면 화면에 수집 지연을 표시합니다. 야간·휴일의 고시 시각과 실제 수집 시각은 별도로 표시합니다.
 - ChatGPT의 2시간 간격 점검 작업은 GitHub의 수집 예약과 별도로 설정된 감시 작업입니다.
 
@@ -40,5 +41,5 @@ python3 scripts/fetch_rates.py
 ```bash
 pip install -r requirements.txt
 python -m unittest discover -s tests -v
-node --test tests/status-health.test.cjs
+node --test tests/*.test.cjs
 ```

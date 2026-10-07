@@ -114,26 +114,29 @@ def _parse_currency_label(label: str) -> tuple[str, str, str | None]:
     return label.strip(), "UNK", None
 
 
-def fetch_html(target_date: datetime) -> str:
+def fetch_html(target_date: datetime, *, first: bool = False) -> str:
     ymd = target_date.strftime("%Y%m%d")
     payload = {
         "tmpInqStrDt": target_date.strftime("%Y-%m-%d"),
-        "pbldDvCd": "3",
-        "pbldSqn": "",
+        "pbldDvCd": "1" if first else "3",
+        "pbldSqn": "1" if first else "",
         "curCd": "",
         "inqStrDt": ymd,
         "inqKindCd": "1",
     }
 
     last_error: Exception | None = None
-    for i in range(3):
+    attempts = 1 if first else 3
+    timeout = (5, 10) if first else (5, 20)
+    for i in range(attempts):
         try:
             with requests.Session() as s:
                 s.headers.update({"User-Agent": "Mozilla/5.0"})
-                page = s.get(SOURCE_PAGE, timeout=(5, 20))
+                page = s.get(SOURCE_PAGE, timeout=timeout)
                 page.raise_for_status()
-                for headers in ({}, {"Referer": SOURCE_PAGE}):
-                    response = s.post(DATA_ENDPOINT, data=payload, headers=headers, timeout=(5, 20))
+                header_options = ({"Referer": SOURCE_PAGE},) if first else ({}, {"Referer": SOURCE_PAGE})
+                for headers in header_options:
+                    response = s.post(DATA_ENDPOINT, data=payload, headers=headers, timeout=timeout)
                     response.raise_for_status()
                     if "tblBasic" in response.text:
                         return response.text
@@ -144,7 +147,7 @@ def fetch_html(target_date: datetime) -> str:
             last_error = e
         except requests.RequestException as e:
             last_error = e
-        if i < 2:
+        if i < attempts - 1:
             time.sleep(2 ** (i + 1))
 
     raise RuntimeError(f"환율 수집 실패: {last_error}")
@@ -285,7 +288,54 @@ def append_snapshot(snapshot: dict):
     return True
 
 
-def rebuild_series():
+def publication_day(snapshot: dict) -> str | None:
+    try:
+        dt = datetime.fromisoformat(snapshot["published_at_kst"])
+        return dt.astimezone(KST).date().isoformat() if dt.tzinfo else None
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def valid_daily_first(snapshot: dict, day: str) -> bool:
+    try:
+        validate_snapshot(snapshot)
+        return snapshot.get("sequence") == 1 and publication_day(snapshot) == day
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def update_daily_first(snapshots):
+    """Cache verified bank first publications separately from the display window."""
+    path = DATA_DIR / "daily-first.json"
+    baselines = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    baselines = {day: snap for day, snap in baselines.items() if valid_daily_first(snap, day)}
+    for snap in snapshots:
+        day = publication_day(snap)
+        if day and valid_daily_first(snap, day):
+            baselines[day] = snap
+    # Resolve the dates actually displayed, newest first; bound network work.
+    days = list(dict.fromkeys(publication_day(snap) for snap in reversed(list(snapshots)[-8:])))
+    for day in [day for day in days if day and day not in baselines][:2]:
+        try:
+            html = fetch_html(datetime.fromisoformat(day).replace(tzinfo=KST), first=True)
+            rows = extract_rows(html)
+            if len({row.code for row in rows}) != len(rows):
+                raise ValueError("최초 고시 중복 통화")
+            first = {
+                **extract_meta(html),
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(),
+                "rates": {row.code: row.base_rate for row in rows},
+            }
+            if not valid_daily_first(first, day):
+                raise ValueError("최초 고시 날짜 또는 1회차 불일치")
+            baselines[day] = first
+        except (requests.RequestException, RuntimeError, ValueError) as error:
+            print(f"최초 고시 미확인 {day}: {error}")
+    atomic_json(path, baselines)
+    return baselines
+
+
+def rebuild_series(*, refresh_baselines=False):
     series: dict[str, list[dict]] = {}
     snapshots = deque(maxlen=3000)
     for file in sorted(HISTORY_DIR.glob("*.ndjson"), reverse=True):
@@ -314,8 +364,12 @@ def rebuild_series():
         series[code] = series[code][-3000:]
 
     atomic_json(DATA_DIR / "series.json", {"series": series})
+    baseline_path = DATA_DIR / "daily-first.json"
+    baselines = update_daily_first(snapshots) if refresh_baselines else (
+        json.loads(baseline_path.read_text(encoding="utf-8")) if baseline_path.exists() else {}
+    )
     # The browser displays only a few recent rows, not the raw monthly archive.
-    atomic_json(DATA_DIR / "recent.json", {"snapshots": [
+    atomic_json(DATA_DIR / "recent.json", {"first_by_date": baselines, "snapshots": [
         {
             "published_text": snap.get("published_text"),
             "published_at_kst": snap.get("published_at_kst"),
@@ -369,7 +423,7 @@ def main():
     validate_snapshot(snapshot, previous)
 
     changed = append_snapshot(snapshot)
-    rebuild_series()
+    rebuild_series(refresh_baselines=True)
     atomic_json(latest_path, snapshot)
 
     print(f"rows={len(rows)} changed={changed} sequence={meta.get('sequence')}")

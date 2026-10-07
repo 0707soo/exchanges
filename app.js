@@ -1,6 +1,7 @@
 let latest;
 let fetchStatus;
 let recentSnapshots = [];
+let firstByDate = {};
 let seriesByPeriod = {};
 let chart;
 let detailsOpen = false;
@@ -116,8 +117,10 @@ async function loadRecentSnapshots() {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const data = await r.json();
     if (!Array.isArray(data.snapshots)) throw new Error('Invalid recent snapshots');
+    firstByDate = data.first_by_date || {};
     return data.snapshots;
   } catch {
+    firstByDate = {};
     return latest ? [latest] : [];
   }
 }
@@ -213,13 +216,11 @@ function renderRecentUpdates(code, points = []) {
     .slice(-8)
     .reverse();
 
-  caption.textContent = `${code} 기준 최근 ${items.length}건`;
-
-  const baseline = items.length ? Number(items[items.length - 1].rows[code].base_rate) : null;
+  caption.textContent = `${code} 기준 최근 ${items.length}건 · 각 고시일 1회차 대비 (미확인 시 -)`;
 
   body.innerHTML = items.map((snap, index) => {
     const currentRate = Number(snap.rows[code].base_rate);
-    const diff = baseline == null ? null : currentRate - baseline;
+    const diff = getDailyFirstDifference(snap, code, firstByDate);
     const diffText = diff == null ? '-' : `${diff > 0 ? '+' : ''}${fmt(diff)}`;
     const diffClass = diff == null ? 'diff-neutral' : diff > 0 ? 'diff-up' : diff < 0 ? 'diff-down' : 'diff-neutral';
     const published = snap.published_text
