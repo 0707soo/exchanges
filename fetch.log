@@ -1,12 +1,14 @@
 [
   {
-    "attempted_at_utc": "2026-10-07T14:35:10.306095+00:00",
+    "attempted_at_utc": "2026-10-07T14:54:41.371283+00:00",
     "exit_code": 0,
     "changed": true,
-    "sequence_before": 611,
-    "sequence_after": 627,
+    "sequence_before": 627,
+    "sequence_after": 640,
     "log_excerpt": [
-      "rows=58 changed=True sequence=627"
+      "최초 고시 미확인 2026-10-07: 환율 수집 실패: 환율 테이블 미검출",
+      "최초 고시 미확인 2026-09-18: 환율 수집 실패: 환율 테이블 미검출",
+      "rows=58 changed=True sequence=640"
     ]
   }
 ]
