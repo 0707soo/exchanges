@@ -134,7 +134,7 @@ def fetch_html(target_date: datetime, *, first: bool = False) -> str:
                 s.headers.update({"User-Agent": "Mozilla/5.0"})
                 page = s.get(SOURCE_PAGE, timeout=timeout)
                 page.raise_for_status()
-                header_options = ({"Referer": SOURCE_PAGE},) if first else ({}, {"Referer": SOURCE_PAGE})
+                header_options = ({},) if first else ({}, {"Referer": SOURCE_PAGE})
                 for headers in header_options:
                     response = s.post(DATA_ENDPOINT, data=payload, headers=headers, timeout=timeout)
                     response.raise_for_status()
