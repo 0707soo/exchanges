@@ -64,6 +64,31 @@ class CollectionTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 fetcher._to_float(value)
 
+    def test_daily_first_is_cached_separately_from_recent_rows(self):
+        current = snapshot()
+        current['sequence'] = 600
+        with patch.object(fetcher, 'fetch_html', return_value=html_fixture()) as request:
+            baselines = fetcher.update_daily_first([current])
+        self.assertEqual(baselines['2020-01-01']['sequence'], 1)
+        self.assertEqual(baselines['2020-01-01']['rates']['USD'], 1234.5)
+        self.assertTrue(request.call_args.kwargs['first'])
+        with patch.object(fetcher, 'fetch_html') as request:
+            self.assertEqual(fetcher.update_daily_first([current]), baselines)
+            request.assert_not_called()
+
+    def test_daily_first_rejects_other_dates_and_nonfirst_sequences(self):
+        current = snapshot()
+        current['sequence'] = 600
+        for html in (html_fixture(date='2019년12월31일'), html_fixture().replace('(1회차)', '(600회차)')):
+            with patch.object(fetcher, 'fetch_html', return_value=html):
+                self.assertEqual(fetcher.update_daily_first([current]), {})
+
+    def test_daily_first_failure_does_not_fabricate_a_baseline(self):
+        current = snapshot()
+        current['sequence'] = 600
+        with patch.object(fetcher, 'fetch_html', side_effect=requests.Timeout('unavailable')):
+            self.assertEqual(fetcher.update_daily_first([current]), {})
+
     def test_validation_rejects_missing_metadata_and_bad_rates(self):
         for key, value in (("sequence", None), ("published_at_kst", None), ("basis_date_text", None)):
             s = snapshot()
