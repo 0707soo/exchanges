@@ -43,6 +43,11 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Sync latest main before collecting
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -167,7 +172,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git pull --rebase --autostash origin main
           python - <<'PY'
           import json
           from pathlib import Path
