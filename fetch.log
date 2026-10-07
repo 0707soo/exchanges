@@ -1,14 +1,14 @@
 [
   {
-    "attempted_at_utc": "2026-10-07T14:54:41.371283+00:00",
+    "attempted_at_utc": "2026-10-07T14:56:25.706071+00:00",
     "exit_code": 0,
     "changed": true,
-    "sequence_before": 627,
-    "sequence_after": 640,
+    "sequence_before": 640,
+    "sequence_after": 643,
     "log_excerpt": [
-      "최초 고시 미확인 2026-10-07: 환율 수집 실패: 환율 테이블 미검출",
-      "최초 고시 미확인 2026-09-18: 환율 수집 실패: 환율 테이블 미검출",
-      "rows=58 changed=True sequence=640"
+      "최초 고시 미확인 2026-10-07: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "최초 고시 미확인 2026-09-18: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "rows=58 changed=True sequence=643"
     ]
   }
 ]
