@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>exchanges</title>
     <link rel="stylesheet" href="styles.css?v=20260424-18" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
   </head>
   <body>
     <main class="wrap">
@@ -68,7 +68,7 @@
               <section class="summary summary-inline" id="summary">
                 <div class="summary-card summary-card-wide"><span>기간 내 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최소 ~ 최대입니다.">?</button></span><strong id="summary-minmax">-</strong></div>
                 <div class="summary-card"><span>변동폭 <button class="hint-button" type="button" data-hint="선택한 기간 안의 최대값과 최소값 차이입니다.">?</button></span><strong id="summary-range">-</strong></div>
-                <div class="summary-card"><span>시작 대비 <button class="hint-button" type="button" data-hint="선택한 기간의 첫 값 대비 현재 변화입니다.">?</button></span><strong id="summary-change">-</strong><em id="summary-change-pct">-</em></div>
+                <div class="summary-card"><span>기간 첫 수집값 대비 <button class="hint-button" type="button" data-hint="선택 기간에서 수집된 첫 값과 마지막 값의 차이입니다. 고시일 1회차 대비는 아래 최근 변동 표에 표시합니다.">?</button></span><strong id="summary-change">-</strong><em id="summary-change-pct">-</em></div>
               </section>
             </div>
           </section>
@@ -103,8 +103,9 @@
         </div>
       </section>
     </main>
-    <script src="status-health.js?v=20261007"></script>
+    <script src="status-health.js?v=20261008"></script>
     <script src="rate-baseline.js?v=20261007"></script>
-    <script src="app.js?v=20261007-daily-first"></script>
+    <script src="chart-data.js?v=20261008"></script>
+    <script src="app.js?v=20261008-audit"></script>
   </body>
 </html>

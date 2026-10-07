@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 import math
 import os
 import re
@@ -260,11 +261,19 @@ def validate_snapshot(snapshot: dict, previous: dict | None = None):
     captured_dt = datetime.fromisoformat(snapshot["captured_at_utc"])
     if published_dt.tzinfo is None or captured_dt.tzinfo is None:
         raise ValueError("환율 시각에 시간대 누락")
+    sequence = snapshot.get("sequence")
+    if type(sequence) is not int or sequence <= 0:
+        raise ValueError("유효하지 않은 고시 회차")
+    basis = re.fullmatch(r"(\d{4})년\s*(\d{2})월\s*(\d{2})일", snapshot["basis_date_text"].strip())
+    if not basis or "-".join(basis.groups()) != publication_day(snapshot):
+        raise ValueError("기준일과 고시일 불일치")
     if (published_dt - captured_dt).total_seconds() > 300:
         raise ValueError("미래 고시 시각")
     if previous and previous.get("published_at_kst"):
         if published_dt < datetime.fromisoformat(previous["published_at_kst"]):
             raise ValueError("이전 고시보다 오래된 응답")
+        if publication_day(previous) == publication_day(snapshot) and sequence < previous.get("sequence", 0):
+            raise ValueError("같은 고시일의 회차 역행")
     rates = snapshot["rates"]
     if not {"USD", "JPY", "EUR", "CNY"}.issubset(rates) or "UNK" in rates:
         raise ValueError("필수 통화 누락 또는 알 수 없는 통화")
@@ -275,7 +284,7 @@ def validate_snapshot(snapshot: dict, previous: dict | None = None):
 
 def append_snapshot(snapshot: dict):
     HISTORY_DIR.mkdir(parents=True, exist_ok=True)
-    month_file = HISTORY_DIR / f"{datetime.now(KST).strftime('%Y-%m')}.ndjson"
+    month_file = HISTORY_DIR / f"{publication_day(snapshot)[:7]}.ndjson"
     prev = load_last_snapshot(month_file)
 
     if prev and prev.get("published_text") == snapshot.get("published_text") and prev.get("sequence") == snapshot.get("sequence"):
@@ -304,18 +313,30 @@ def valid_daily_first(snapshot: dict, day: str) -> bool:
         return False
 
 
-def update_daily_first(snapshots):
+def read_daily_first():
+    path = DATA_DIR / "daily-first.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+        if not isinstance(data, dict):
+            raise ValueError("최초 고시 파일은 객체여야 합니다")
+        return {day: snap for day, snap in data.items() if isinstance(snap, dict) and valid_daily_first(snap, day)}
+    except (ValueError, TypeError):
+        print("최초 고시 캐시 손상: 검증된 이력과 원천 조회로 복구합니다")
+        return {}
+
+
+def update_daily_first(snapshots, *, fetch_missing=True):
     """Cache verified bank first publications separately from the display window."""
     path = DATA_DIR / "daily-first.json"
-    baselines = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    baselines = {day: snap for day, snap in baselines.items() if valid_daily_first(snap, day)}
+    baselines = read_daily_first()
     for snap in snapshots:
         day = publication_day(snap)
         if day and valid_daily_first(snap, day):
-            baselines[day] = snap
+            baselines.setdefault(day, snap)
+    atomic_json(path, baselines)
     # Resolve the dates actually displayed, newest first; bound network work.
     days = list(dict.fromkeys(publication_day(snap) for snap in reversed(list(snapshots)[-8:])))
-    for day in [day for day in days if day and day not in baselines][:2]:
+    for day in ([day for day in days if day and day not in baselines][:2] if fetch_missing else []):
         try:
             html = fetch_html(datetime.fromisoformat(day).replace(tzinfo=KST), first=True)
             rows = extract_rows(html)
@@ -329,6 +350,7 @@ def update_daily_first(snapshots):
             if not valid_daily_first(first, day):
                 raise ValueError("최초 고시 날짜 또는 1회차 불일치")
             baselines[day] = first
+            atomic_json(path, baselines)
         except (requests.RequestException, RuntimeError, ValueError) as error:
             print(f"최초 고시 미확인 {day}: {error}")
     atomic_json(path, baselines)
@@ -358,18 +380,17 @@ def rebuild_series(*, refresh_baselines=False):
         if not ts:
             ts = snap["captured_at_utc"]
         for code, v in snap["rates"].items():
-            series.setdefault(code, []).append({"t": ts, "v": v})
+            series.setdefault(code, []).append({"t": ts, "v": v, "sequence": snap.get("sequence")})
 
     for code in list(series.keys()):
         series[code] = series[code][-3000:]
 
     atomic_json(DATA_DIR / "series.json", {"series": series})
-    baseline_path = DATA_DIR / "daily-first.json"
-    baselines = update_daily_first(snapshots) if refresh_baselines else (
-        json.loads(baseline_path.read_text(encoding="utf-8")) if baseline_path.exists() else {}
-    )
+    baselines = update_daily_first(snapshots, fetch_missing=refresh_baselines)
+    recent = list(snapshots)[-100:]
+    recent_days = {publication_day(snap) for snap in recent}
     # The browser displays only a few recent rows, not the raw monthly archive.
-    atomic_json(DATA_DIR / "recent.json", {"first_by_date": baselines, "snapshots": [
+    atomic_json(DATA_DIR / "recent.json", {"first_by_date": {day: snap for day, snap in baselines.items() if day in recent_days}, "snapshots": [
         {
             "published_text": snap.get("published_text"),
             "published_at_kst": snap.get("published_at_kst"),
@@ -377,7 +398,7 @@ def rebuild_series(*, refresh_baselines=False):
             "sequence": snap.get("sequence"),
             "rows": {code: {"base_rate": value} for code, value in snap["rates"].items()},
         }
-        for snap in list(snapshots)[-100:]
+        for snap in recent
     ]})
 
     # 기간별 경량 파일
@@ -423,11 +444,17 @@ def main():
     validate_snapshot(snapshot, previous)
 
     changed = append_snapshot(snapshot)
-    rebuild_series(refresh_baselines=True)
+    rebuild_series()
     atomic_json(latest_path, snapshot)
 
     print(f"rows={len(rows)} changed={changed} sequence={meta.get('sequence')}")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--refresh-baselines", action="store_true")
+    args = parser.parse_args()
+    if args.refresh_baselines:
+        rebuild_series(refresh_baselines=True)
+    else:
+        main()
