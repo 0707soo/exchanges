@@ -549,6 +549,10 @@ async function checkForDataUpdate() {
   if (autoRefreshInFlight) return;
   autoRefreshInFlight = true;
   try {
+    if (!latestFingerprint) {
+      await load();
+      return;
+    }
     const nextLatest = validateLatest(await fetchJson('./data/latest.json'));
     const nextFingerprint = getLatestFingerprint(nextLatest);
     if (latestFingerprint && nextFingerprint && nextFingerprint !== latestFingerprint) {
@@ -644,6 +648,14 @@ function render(code) {
   }
 
   if (chart) chart.destroy();
+  const chartMessage = document.getElementById('chart-message');
+  if (typeof Chart !== 'function') {
+    chartMessage.hidden = false;
+    chartMessage.textContent = '차트를 불러올 수 없습니다. 페이지를 새로고침해 주세요.';
+    return;
+  }
+  chartMessage.hidden = labels.length > 0;
+  chartMessage.textContent = labels.length ? '' : '선택 기간에 수집된 이력이 없습니다.';
   chart = new Chart(document.getElementById('chart'), {
     type: 'line',
     data: {
@@ -683,6 +695,7 @@ async function ensureSeries(period) {
 }
 
 load().catch(err => {
+  startAutoRefresh();
   document.getElementById('meta-published').textContent = '고시: 데이터 로드 실패';
   document.getElementById('meta-collected').textContent = '오류: ' + err.message;
   document.getElementById('meta-detected').textContent = '최종 감지: 확인 불가';

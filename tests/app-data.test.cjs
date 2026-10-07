@@ -41,3 +41,16 @@ test('search rebuilding options preserves a selected matching currency', () => {
   assert.equal(select.value, 'JPY');
   assert.deepEqual(select.options, ['JPY']);
 });
+
+test('an unavailable chart library does not turn valid rate data into a load failure', () => {
+  const elements = new Map();
+  const document = { getElementById(id) {
+    if (!elements.has(id)) elements.set(id, { textContent: '', hidden: true, querySelectorAll: () => [], classList: { remove() {}, add() {} } });
+    return elements.get(id);
+  } };
+  const context = appContext({ document, ...require('../chart-data.js') });
+  vm.runInContext("latest = {rows: {USD: {base_rate: 1340}}, captured_at_utc: '2026-10-07T12:00:00Z'}; currentEndDate = '2026-10-07'; render('USD')", context);
+  assert.equal(elements.get('base').textContent, '1,340');
+  assert.equal(elements.get('chart-message').hidden, false);
+  assert.match(elements.get('chart-message').textContent, /차트를 불러올 수 없습니다/);
+});
