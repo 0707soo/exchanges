@@ -1,6 +1,12 @@
 name: rates-burst-sync
 
 on:
+  # Run immediately after source changes; ignore the collector's own data commits.
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'data/**'
+      - 'fetch.log'
   # A scheduled trigger restarts collection independently of the keeper chain.
   schedule:
     - cron: '*/5 * * * *'
