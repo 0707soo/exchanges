@@ -1,14 +1,12 @@
 [
   {
-    "attempted_at_utc": "2026-10-07T14:56:25.706071+00:00",
+    "attempted_at_utc": "2026-10-07T14:59:45.188188+00:00",
     "exit_code": 0,
     "changed": true,
-    "sequence_before": 640,
-    "sequence_after": 643,
+    "sequence_before": 643,
+    "sequence_after": 659,
     "log_excerpt": [
-      "최초 고시 미확인 2026-10-07: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
-      "최초 고시 미확인 2026-09-18: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
-      "rows=58 changed=True sequence=643"
+      "rows=58 changed=True sequence=659"
     ]
   }
 ]
