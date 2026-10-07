@@ -33,8 +33,8 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    # fetch_rates.py already performs bounded upstream retries (up to ~5 min).
-    # Keep enough room for one complete collection plus validation and push.
+    # run_collection.py bounds the primary collection and optional baseline refresh.
+    # Leave room for dependency setup and committing the result.
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Poll with calmer cadence
+      - name: Collect rates and refresh first publications
         id: poll
         run: python scripts/run_collection.py
         env:
@@ -83,8 +83,8 @@ jobs:
             git pull --rebase origin main
           done
 
-      - name: Fail if all attempts failed
+      - name: Fail if primary collection failed
         if: steps.poll.outputs.had_success != 'true'
         run: |
-          echo "Exchange rate fetch failed for the entire polling window. See fetch.log and data/status.json for details."
+          echo "Primary exchange collection failed. See fetch.log and data/status.json for details."
           exit 1

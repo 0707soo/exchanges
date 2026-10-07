@@ -9,7 +9,7 @@ on:
         default: '330'
         type: string
       stale_limit_seconds:
-        description: 'Stop if the repo status is stale beyond this many seconds'
+        description: 'Status age that triggers collection recovery'
         required: false
         default: '1800'
         type: string

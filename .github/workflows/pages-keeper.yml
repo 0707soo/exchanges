@@ -14,7 +14,7 @@ on:
         default: '300'
         type: string
       stale_limit_seconds:
-        description: 'Stop if repo status is stale beyond this many seconds'
+        description: 'Status age reported as stale while monitoring'
         required: false
         default: '7200'
         type: string

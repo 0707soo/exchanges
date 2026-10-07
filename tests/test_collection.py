@@ -64,6 +64,74 @@ class CollectionTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 fetcher._to_float(value)
 
+    def test_same_date_sequence_regression_is_rejected(self):
+        previous = snapshot()
+        previous['sequence'] = 611
+        current = snapshot()
+        current['sequence'] = 609
+        with self.assertRaises(ValueError):
+            fetcher.validate_snapshot(current, previous)
+
+    def test_invalid_sequences_and_basis_date_mismatch_are_rejected(self):
+        for sequence in (0, -1, True, '1'):
+            current = snapshot()
+            current['sequence'] = sequence
+            with self.assertRaises(ValueError):
+                fetcher.validate_snapshot(current)
+        current = snapshot()
+        current['basis_date_text'] = '2019년12월31일'
+        with self.assertRaises(ValueError):
+            fetcher.validate_snapshot(current)
+
+    def test_history_month_uses_publication_not_collection_date(self):
+        current = snapshot()
+        current['captured_at_utc'] = '2020-02-01T00:01:00Z'
+        self.assertTrue(fetcher.append_snapshot(current))
+        self.assertEqual([p.name for p in self.history.iterdir()], ['2020-01.ndjson'])
+
+    def test_corrupt_first_cache_recovers_from_verified_history_without_network(self):
+        (self.data / 'daily-first.json').write_text('{broken', encoding='utf-8')
+        with patch.object(fetcher, 'fetch_html') as request:
+            baselines = fetcher.update_daily_first([snapshot()], fetch_missing=False)
+            request.assert_not_called()
+        self.assertEqual(baselines['2020-01-01']['rates']['USD'], 100.0)
+
+    def test_primary_collection_does_not_request_optional_baselines(self):
+        html = html_fixture().replace('(1회차)', '(600회차)')
+        with patch.object(fetcher, 'fetch_html', return_value=html) as request:
+            fetcher.main()
+        self.assertEqual(request.call_count, 1)
+        self.assertEqual(json.loads((self.data / 'latest.json').read_text())['sequence'], 600)
+
+    def test_baseline_timeout_does_not_fail_successful_collection(self):
+        fetcher.atomic_json(self.data / 'latest.json', snapshot())
+        completed = runner.subprocess.CompletedProcess('fetch', 0, 'rows=4', '')
+        with patch.object(runner.subprocess, 'run', side_effect=[completed, runner.subprocess.TimeoutExpired('baselines', 45)]):
+            status = runner.collect(self.root)
+        self.assertTrue(status['last_attempt_success'])
+        self.assertIsNotNone(status['last_success_at_utc'])
+        self.assertEqual(status['failure_streak'], 0)
+        self.assertTrue(status['warnings'])
+
+    def test_corrupt_latest_is_preserved_and_failure_status_is_written(self):
+        path = self.data / 'latest.json'
+        path.write_text('{broken', encoding='utf-8')
+        with patch.object(runner.subprocess, 'run') as request:
+            status = runner.collect(self.root)
+            request.assert_not_called()
+        self.assertFalse(status['last_attempt_success'])
+        self.assertEqual(path.read_text(), '{broken')
+        self.assertTrue((self.data / 'status.json').exists())
+
+    def test_corrupt_status_and_counters_do_not_stop_failure_reporting(self):
+        fetcher.atomic_json(self.data / 'latest.json', snapshot())
+        for text in ('{broken', '{"total_failures": "bad", "failure_streak": null}'):
+            (self.data / 'status.json').write_text(text, encoding='utf-8')
+            with patch.object(runner.subprocess, 'run', side_effect=OSError('cannot start')):
+                status = runner.collect(self.root)
+            self.assertFalse(status['last_attempt_success'])
+            self.assertEqual(status['total_failures'], 1)
+
     def test_daily_first_is_cached_separately_from_recent_rows(self):
         current = snapshot()
         current['sequence'] = 600

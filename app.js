@@ -72,9 +72,7 @@ const toDateInputValue = (iso) => {
   return `${get('year')}-${get('month')}-${get('day')}`;
 };
 const shiftDateInputValue = (dateValue, days) => {
-  const base = new Date(`${dateValue}T12:00:00+09:00`);
-  base.setDate(base.getDate() + days);
-  return toDateInputValue(base.toISOString());
+  return shiftCalendarDate(dateValue, days);
 };
 const getTodayKstValue = () => toDateInputValue(new Date().toISOString());
 function getLatestPublishedDateValue() {
@@ -89,20 +87,10 @@ function getLatestPublishedDateValue() {
 }
 function getRangeWindow(period) {
   const endDate = currentEndDate || toDateInputValue(latest?.captured_at_utc || new Date().toISOString());
-  const start = new Date(`${endDate}T00:00:00+09:00`);
-  const end = new Date(`${endDate}T23:59:59+09:00`);
-  if (period === '1d') return { start, end };
-  const days = period === '7d' ? 7 : 30;
-  const windowStart = new Date(start);
-  windowStart.setDate(windowStart.getDate() - (days - 1));
-  return { start: windowStart, end };
+  return rangeWindow(endDate, period);
 }
 function filterPoints(points, period) {
-  const { start, end } = getRangeWindow(period);
-  return points.filter((point) => {
-    const dt = new Date(point.t);
-    return dt >= start && dt <= end;
-  });
+  return validPoints(points, getRangeWindow(period));
 }
 
 function formatDetectedTime() {
@@ -111,11 +99,32 @@ function formatDetectedTime() {
   return '-';
 }
 
+async function fetchJson(path) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(withCacheBust(path), { cache: 'no-store', signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function validateLatest(data) {
+  if (!data?.rows || !Number.isFinite(Date.parse(data.published_at_kst))
+      || !Number.isFinite(Date.parse(data.captured_at_utc))) throw new Error('Invalid latest metadata');
+  const rows = Object.entries(data.rows);
+  if (!rows.length || rows.some(([code, row]) => !/^[A-Z]{3}$/.test(code)
+      || typeof row?.base_rate !== 'number' || !Number.isFinite(row.base_rate) || row.base_rate <= 0)) {
+    throw new Error('Invalid latest rates');
+  }
+  return data;
+}
+
 async function loadRecentSnapshots() {
   try {
-    const r = await fetch(withCacheBust('./data/recent.json'), { cache: 'no-store' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const data = await r.json();
+    const data = await fetchJson('./data/recent.json');
     if (!Array.isArray(data.snapshots)) throw new Error('Invalid recent snapshots');
     firstByDate = data.first_by_date || {};
     return data.snapshots;
@@ -177,6 +186,11 @@ function renderFavoriteCodes(selectedCode) {
     btn.addEventListener('click', () => {
       const code = btn.dataset.favoriteCode;
       const currency = document.getElementById('currency');
+      const search = document.getElementById('currency-search');
+      if (!filteredCodes.includes(code)) {
+        search.value = '';
+        applyCurrencyFilter(Object.keys(latest.rows).sort(), '');
+      }
       currency.value = code;
       render(code);
     });
@@ -185,6 +199,7 @@ function renderFavoriteCodes(selectedCode) {
 
 function applyCurrencyFilter(allCodes, keyword) {
   const currency = document.getElementById('currency');
+  const selectedCode = currency.value;
   const term = keyword.trim().toLowerCase();
   filteredCodes = allCodes.filter((code) => {
     const row = latest.rows[code];
@@ -192,6 +207,7 @@ function applyCurrencyFilter(allCodes, keyword) {
     return !term || haystack.includes(term);
   });
   currency.innerHTML = filteredCodes.map((code) => `<option value="${code}">${code} - ${escapeHtml(latest.rows[code].country)}</option>`).join('');
+  if (filteredCodes.includes(selectedCode)) currency.value = selectedCode;
   return filteredCodes;
 }
 
@@ -227,7 +243,7 @@ function renderRecentUpdates(code, points = []) {
       ? normalizeDateTimeText(snap.published_text)
       : (snap.published_at_kst ? toKst(snap.published_at_kst) : '-');
     return `
-      <tr class="${index === 0 ? 'is-latest' : ''}">
+      <tr data-published="${escapeHtml(snap.published_at_kst || '')}" data-sequence="${snap.sequence || ''}" class="${index === 0 ? 'is-latest' : ''} ${snapshotPointIndex(points, snap) === activePointIndex && activePointIndex !== null ? 'is-selected' : ''}">
         <td>${escapeHtml(published)}</td>
         <td>${snap.sequence || '-'}</td>
         <td>${fmt(currentRate)}</td>
@@ -239,29 +255,22 @@ function renderRecentUpdates(code, points = []) {
   body.querySelectorAll('tr[data-published]').forEach((rowEl) => {
     rowEl.addEventListener('click', () => {
       const publishedAt = rowEl.dataset.published;
-      if (!publishedAt || !points.length) return;
-      let nearestIndex = 0;
-      let nearestDistance = Number.POSITIVE_INFINITY;
-      points.forEach((point, idx) => {
-        const distance = Math.abs(new Date(point.t).getTime() - new Date(publishedAt).getTime());
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
-          nearestIndex = idx;
-        }
-      });
-      activePointIndex = nearestIndex;
-      body.querySelectorAll('tr').forEach((tr) => tr.classList.remove('is-selected'));
-      rowEl.classList.add('is-selected');
-      chart?.update();
+      if (!Number.isFinite(Date.parse(publishedAt))) return;
+      currentEndDate = toDateInputValue(publishedAt);
+      document.getElementById('range-end-date').value = currentEndDate;
+      const selectedPoints = filterPoints(seriesByPeriod[currentPeriod]?.[code] || [], currentPeriod);
+      const index = snapshotPointIndex(selectedPoints, { published_at_kst: publishedAt, sequence: Number(rowEl.dataset.sequence) });
+      activePointIndex = index < 0 ? null : index;
+      render(code);
     });
   });
 }
 
 async function loadStatus() {
   try {
-    const r = await fetch(withCacheBust('./data/status.json'), { cache: 'no-store' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return await r.json();
+    const data = await fetchJson('./data/status.json');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid collection status');
+    return data;
   } catch {
     return null;
   }
@@ -279,6 +288,8 @@ function updateSummary(points) {
     range.textContent = '-';
     change.textContent = '-';
     changePct.textContent = '-';
+    setTextAndClass(change, '-', 'value-neutral');
+    setTextAndClass(changePct, '-', 'pct-neutral');
     return;
   }
 
@@ -323,20 +334,28 @@ function renderFetchStatus() {
   if (!fetchStatus) {
     statusLine.textContent = '수집 상태: 상태 파일 없음';
     document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 확인 불가';
-    banner.hidden = true;
+    banner.hidden = false;
+    banner.textContent = '수집 상태를 확인할 수 없습니다.';
     updateMetaCompact();
     return;
   }
 
   const attempted = Number.isFinite(Date.parse(fetchStatus.last_attempt_at_utc))
     ? formatKstDateTime(fetchStatus.last_attempt_at_utc) : '-';
-  const success = !!fetchStatus.last_attempt_success;
+  const success = fetchStatus.last_attempt_success === true;
   const streak = Number(fetchStatus.failure_streak || 0);
   const total = Number(fetchStatus.total_failures || 0);
 
   const lastSuccess = fetchStatus.last_success_at_utc || fetchStatus.latest_captured_at_utc;
   document.getElementById('meta-last-success').textContent = Number.isFinite(Date.parse(lastSuccess))
     ? `마지막 성공 수집: ${formatKstDateTime(lastSuccess)}` : '마지막 성공 수집: 확인 불가';
+  if (getFetchHealth(fetchStatus).label === '확인 불가') {
+    statusLine.textContent = '수집 상태: 확인 불가';
+    banner.hidden = false;
+    banner.textContent = '수집 결과를 확인할 수 없습니다.';
+    updateMetaCompact();
+    return;
+  }
   if (getFetchHealth(fetchStatus).stale) {
     statusLine.textContent = `수집 상태: 지연 (마지막 시도 ${attempted})`;
     banner.hidden = false;
@@ -363,7 +382,9 @@ function renderFetchStatus() {
 }
 
 async function fetchSeries30d() {
-  return fetch(withCacheBust('./data/series-30d.json'), { cache: 'no-store' }).then(r => r.json());
+  const data = await fetchJson('./data/series-30d.json');
+  if (!data?.series || typeof data.series !== 'object' || Array.isArray(data.series)) throw new Error('Invalid chart data');
+  return data;
 }
 
 function setSeriesForAllPeriods(series) {
@@ -374,7 +395,7 @@ function setSeriesForAllPeriods(series) {
 
 async function loadInitialData() {
   const [l, s, status] = await Promise.all([
-    fetch(withCacheBust('./data/latest.json'), { cache: 'no-store' }).then(r => r.json()),
+    fetchJson('./data/latest.json').then(validateLatest),
     fetchSeries30d(),
     loadStatus(),
   ]);
@@ -402,7 +423,7 @@ async function load() {
 
   const currencySearch = document.getElementById('currency-search');
   currencySearch.addEventListener('input', () => {
-    const matches = applyCurrencyFilter(codes, currencySearch.value);
+    const matches = applyCurrencyFilter(Object.keys(latest.rows).sort(), currencySearch.value);
     const fallback = matches.includes(currency.value) ? currency.value : (matches[0] || '');
     if (fallback) {
       currency.value = fallback;
@@ -528,15 +549,19 @@ async function checkForDataUpdate() {
   if (autoRefreshInFlight) return;
   autoRefreshInFlight = true;
   try {
-    const r = await fetch(withCacheBust('./data/latest.json'), { cache: 'no-store' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const nextLatest = await r.json();
+    if (!latestFingerprint) {
+      await load();
+      return;
+    }
+    const nextLatest = validateLatest(await fetchJson('./data/latest.json'));
     const nextFingerprint = getLatestFingerprint(nextLatest);
     if (latestFingerprint && nextFingerprint && nextFingerprint !== latestFingerprint) {
       await refreshData(nextLatest);
     } else {
       fetchStatus = await loadStatus();
+      recentSnapshots = await loadRecentSnapshots();
       renderFetchStatus();
+      if (!compareBetaEnabled) renderRecentUpdates(document.getElementById('currency').value, filterPoints(seriesByPeriod[currentPeriod]?.[document.getElementById('currency').value] || [], currentPeriod));
     }
   } catch (err) {
     renderFetchStatus();
@@ -570,13 +595,6 @@ function syncMetaVisibility() {
   metaToggle.setAttribute('aria-expanded', String(metaOpen));
 }
 
-function normalizeSeries(points) {
-  if (!points.length) return [];
-  const first = Number(points[0].v);
-  if (!first) return [];
-  return points.map((point) => ({ ...point, nv: (Number(point.v) / first) * 100 }));
-}
-
 function render(code) {
   const row = latest.rows[code];
   if (!row) return;
@@ -595,15 +613,11 @@ function render(code) {
   let datasets = [];
 
   if (compareBetaEnabled) {
-    const activeCodes = compareCodes.filter((item) => series[item]?.length).slice(0, 5);
-    const normalizedGroups = activeCodes.map((item) => ({
-      code: item,
-      points: normalizeSeries(filterPoints(series[item] || [], currentPeriod)),
-    })).filter((group) => group.points.length);
-    labels = normalizedGroups[0]?.points.map((point) => toKstShort(point.t)) || [];
-    datasets = normalizedGroups.map((group, index) => ({
+    const comparison = alignedComparison(series, compareCodes.slice(0, 5), getRangeWindow(currentPeriod));
+    labels = comparison.labels.map(toKstShort);
+    datasets = comparison.groups.map((group, index) => ({
       label: group.code,
-      data: group.points.map((point) => point.nv),
+      data: group.values,
       borderColor: COMPARE_COLORS[index % COMPARE_COLORS.length],
       backgroundColor: 'transparent',
       tension: 0.2,
@@ -634,6 +648,14 @@ function render(code) {
   }
 
   if (chart) chart.destroy();
+  const chartMessage = document.getElementById('chart-message');
+  if (typeof Chart !== 'function') {
+    chartMessage.hidden = false;
+    chartMessage.textContent = '차트를 불러올 수 없습니다. 페이지를 새로고침해 주세요.';
+    return;
+  }
+  chartMessage.hidden = labels.length > 0;
+  chartMessage.textContent = labels.length ? '' : '선택 기간에 수집된 이력이 없습니다.';
   chart = new Chart(document.getElementById('chart'), {
     type: 'line',
     data: {
@@ -673,6 +695,7 @@ async function ensureSeries(period) {
 }
 
 load().catch(err => {
+  startAutoRefresh();
   document.getElementById('meta-published').textContent = '고시: 데이터 로드 실패';
   document.getElementById('meta-collected').textContent = '오류: ' + err.message;
   document.getElementById('meta-detected').textContent = '최종 감지: 확인 불가';
