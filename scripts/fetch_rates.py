@@ -2,8 +2,12 @@
 from __future__ import annotations
 
 import json
+import math
+import os
 import re
+import tempfile
 import time
+from collections import deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -94,7 +98,10 @@ def _to_float(s: str) -> float:
     s = s.replace(",", "").strip()
     if not s:
         return 0.0
-    return float(s)
+    value = float(s)
+    if not math.isfinite(value) or value < 0:
+        raise ValueError(f"Invalid rate: {s}")
+    return value
 
 
 def _parse_currency_label(label: str) -> tuple[str, str, str | None]:
@@ -119,31 +126,26 @@ def fetch_html(target_date: datetime) -> str:
     }
 
     last_error: Exception | None = None
-    for i in range(5):
+    for i in range(3):
         try:
-            s = requests.Session()
-            s.headers.update({
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-            })
-            s.get(SOURCE_PAGE, timeout=30)
-
-            r = s.post(DATA_ENDPOINT, data=payload, timeout=30)
-            r.raise_for_status()
-            html = r.text
-            if "tblBasic" in html:
-                return html
-
-            r2 = s.post(DATA_ENDPOINT, data=payload, headers={"Referer": SOURCE_PAGE}, timeout=30)
-            r2.raise_for_status()
-            html = r2.text
-            if "tblBasic" in html:
-                return html
-
-            last_error = RuntimeError("환율 테이블 미검출")
-        except Exception as e:
+            with requests.Session() as s:
+                s.headers.update({"User-Agent": "Mozilla/5.0"})
+                page = s.get(SOURCE_PAGE, timeout=(5, 20))
+                page.raise_for_status()
+                for headers in ({}, {"Referer": SOURCE_PAGE}):
+                    response = s.post(DATA_ENDPOINT, data=payload, headers=headers, timeout=(5, 20))
+                    response.raise_for_status()
+                    if "tblBasic" in response.text:
+                        return response.text
+                last_error = RuntimeError("환율 테이블 미검출")
+        except requests.HTTPError as e:
+            if e.response is not None and e.response.status_code not in {408, 429, 500, 502, 503, 504}:
+                raise
             last_error = e
-
-        time.sleep(2 + i)
+        except requests.RequestException as e:
+            last_error = e
+        if i < 2:
+            time.sleep(2 ** (i + 1))
 
     raise RuntimeError(f"환율 수집 실패: {last_error}")
 
@@ -205,16 +207,67 @@ def extract_rows(html: str) -> list[RateRow]:
     return rows
 
 
+def reverse_lines(path: Path):
+    """Read newest NDJSON lines without loading or scanning the whole file."""
+    with path.open("rb") as f:
+        position = f.seek(0, os.SEEK_END)
+        remainder = b""
+        while position:
+            size = min(position, 65536)
+            position -= size
+            f.seek(position)
+            chunks = (f.read(size) + remainder).split(b"\n")
+            remainder = chunks[0]
+            for line in reversed(chunks[1:]):
+                if line.strip():
+                    yield line.decode("utf-8")
+        if remainder.strip():
+            yield remainder.decode("utf-8")
+
+
 def load_last_snapshot(path: Path) -> dict | None:
     if not path.exists():
         return None
-    last = None
-    with path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                last = json.loads(line)
-    return last
+    line = next(reverse_lines(path), None)
+    return json.loads(line) if line else None
+
+
+def atomic_json(path: Path, value: object):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as f:
+            temporary = Path(f.name)
+            json.dump(value, f, ensure_ascii=False, indent=2, allow_nan=False)
+            f.write("\n")
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def validate_snapshot(snapshot: dict, previous: dict | None = None):
+    """Reject malformed or regressing upstream responses before writing data."""
+    published = snapshot.get("published_at_kst")
+    if not published or not snapshot.get("basis_date_text") or snapshot.get("sequence") is None:
+        raise ValueError("고시 날짜 또는 회차 누락")
+    published_dt = datetime.fromisoformat(published)
+    captured_dt = datetime.fromisoformat(snapshot["captured_at_utc"])
+    if published_dt.tzinfo is None or captured_dt.tzinfo is None:
+        raise ValueError("환율 시각에 시간대 누락")
+    if (published_dt - captured_dt).total_seconds() > 300:
+        raise ValueError("미래 고시 시각")
+    if previous and previous.get("published_at_kst"):
+        if published_dt < datetime.fromisoformat(previous["published_at_kst"]):
+            raise ValueError("이전 고시보다 오래된 응답")
+    rates = snapshot["rates"]
+    if not {"USD", "JPY", "EUR", "CNY"}.issubset(rates) or "UNK" in rates:
+        raise ValueError("필수 통화 누락 또는 알 수 없는 통화")
+    for code, value in rates.items():
+        if not re.fullmatch(r"[A-Z]{3}", code) or not math.isfinite(value) or value <= 0:
+            raise ValueError(f"유효하지 않은 매매기준율: {code}")
 
 
 def append_snapshot(snapshot: dict):
@@ -226,53 +279,56 @@ def append_snapshot(snapshot: dict):
         return False
 
     with month_file.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(snapshot, ensure_ascii=False) + "\n")
+        f.write(json.dumps(snapshot, ensure_ascii=False, allow_nan=False) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
     return True
 
 
 def rebuild_series():
     series: dict[str, list[dict]] = {}
-    for file in sorted(HISTORY_DIR.glob("*.ndjson")):
-        with file.open("r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                snap = json.loads(line)
-                ts = snap.get("published_at_kst")
-                if not ts and snap.get("published_text"):
-                    m = re.search(r"(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{2})시\s*(\d{2})분\s*(\d{2})초", snap["published_text"])
-                    if m:
-                        ts = datetime(
-                            int(m.group(1)), int(m.group(2)), int(m.group(3)),
-                            int(m.group(4)), int(m.group(5)), int(m.group(6)),
-                            tzinfo=KST,
-                        ).isoformat()
-                if not ts:
-                    ts = snap["captured_at_utc"]
-                for code, v in snap["rates"].items():
-                    series.setdefault(code, []).append({"t": ts, "v": v})
+    snapshots = deque(maxlen=3000)
+    for file in sorted(HISTORY_DIR.glob("*.ndjson"), reverse=True):
+        for line in reverse_lines(file):
+            snapshots.appendleft(json.loads(line))
+            if len(snapshots) == snapshots.maxlen:
+                break
+        if len(snapshots) == snapshots.maxlen:
+            break
+    for snap in snapshots:
+        ts = snap.get("published_at_kst")
+        if not ts and snap.get("published_text"):
+            m = re.search(r"(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{2})시\s*(\d{2})분\s*(\d{2})초", snap["published_text"])
+            if m:
+                ts = datetime(
+                    int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                    int(m.group(4)), int(m.group(5)), int(m.group(6)),
+                    tzinfo=KST,
+                ).isoformat()
+        if not ts:
+            ts = snap["captured_at_utc"]
+        for code, v in snap["rates"].items():
+            series.setdefault(code, []).append({"t": ts, "v": v})
 
     for code in list(series.keys()):
         series[code] = series[code][-3000:]
 
-    (DATA_DIR / "series.json").write_text(
-        json.dumps({"series": series}, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    atomic_json(DATA_DIR / "series.json", {"series": series})
+    # The browser displays only a few recent rows, not the raw monthly archive.
+    atomic_json(DATA_DIR / "recent.json", {"snapshots": [
+        {
+            "published_text": snap.get("published_text"),
+            "published_at_kst": snap.get("published_at_kst"),
+            "captured_at_utc": snap.get("captured_at_utc"),
+            "sequence": snap.get("sequence"),
+            "rows": {code: {"base_rate": value} for code, value in snap["rates"].items()},
+        }
+        for snap in list(snapshots)[-100:]
+    ]})
 
     # 기간별 경량 파일
-    (DATA_DIR / "series-1d.json").write_text(
-        json.dumps({"series": {k: v[-144:] for k, v in series.items()}}, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    (DATA_DIR / "series-7d.json").write_text(
-        json.dumps({"series": {k: v[-1008:] for k, v in series.items()}}, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    (DATA_DIR / "series-30d.json").write_text(
-        json.dumps({"series": {k: v[-3000:] for k, v in series.items()}}, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    for label, count in (("1d", 144), ("7d", 1008), ("30d", 3000)):
+        atomic_json(DATA_DIR / f"series-{label}.json", {"series": {k: v[-count:] for k, v in series.items()}})
 
 
 def main():
@@ -282,6 +338,8 @@ def main():
     html = fetch_html(now_kst)
     meta = extract_meta(html)
     rows = extract_rows(html)
+    if len({row.code for row in rows}) != len(rows):
+        raise ValueError("중복 통화 코드")
 
     rates = {r.code: r.base_rate for r in rows}
     row_map = {
@@ -306,13 +364,13 @@ def main():
         "rows": row_map,
     }
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    (DATA_DIR / "latest.json").write_text(
-        json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    latest_path = DATA_DIR / "latest.json"
+    previous = json.loads(latest_path.read_text(encoding="utf-8")) if latest_path.exists() else None
+    validate_snapshot(snapshot, previous)
 
     changed = append_snapshot(snapshot)
     rebuild_series()
+    atomic_json(latest_path, snapshot)
 
     print(f"rows={len(rows)} changed={changed} sequence={meta.get('sequence')}")
 

@@ -32,10 +32,16 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Stage public assets
+        run: |
+          mkdir -p _site/data
+          cp index.html app.js status-health.js styles.css _site/
+          cp data/*.json _site/data/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment

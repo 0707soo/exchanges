@@ -19,6 +19,9 @@ let latestFingerprint = null;
 let autoRefreshTimer = null;
 let autoRefreshInFlight = false;
 
+const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[char]));
 const withCacheBust = (path) => `${path}${path.includes('?') ? '&' : '?'}_=${Date.now()}`;
 const getLatestFingerprint = (data) => [
   data?.published_at_kst || '',
@@ -107,33 +110,16 @@ function formatDetectedTime() {
   return '-';
 }
 
-function getHistoryMonthCandidates() {
-  const base = latest?.captured_at_utc ? new Date(latest.captured_at_utc) : new Date();
-  const current = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit'
-  }).format(base).slice(0, 7);
-  const prevDate = new Date(base);
-  prevDate.setUTCDate(1);
-  prevDate.setUTCMonth(prevDate.getUTCMonth() - 1);
-  const previous = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit'
-  }).format(prevDate).slice(0, 7);
-  return [...new Set([current, previous])];
-}
-
 async function loadRecentSnapshots() {
-  for (const month of getHistoryMonthCandidates()) {
-    try {
-      const r = await fetch(withCacheBust(`./data/history/${month}.ndjson`), { cache: 'no-store' });
-      if (!r.ok) continue;
-      const text = await r.text();
-      const rows = text.split('\n').map(line => line.trim()).filter(Boolean).map(line => JSON.parse(line));
-      if (rows.length) return rows;
-    } catch {
-      // ignore and try next candidate
-    }
+  try {
+    const r = await fetch(withCacheBust('./data/recent.json'), { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    if (!Array.isArray(data.snapshots)) throw new Error('Invalid recent snapshots');
+    return data.snapshots;
+  } catch {
+    return latest ? [latest] : [];
   }
-  return [];
 }
 
 function getDiffClass(value) {
@@ -202,7 +188,7 @@ function applyCurrencyFilter(allCodes, keyword) {
     const haystack = `${code} ${row.country}`.toLowerCase();
     return !term || haystack.includes(term);
   });
-  currency.innerHTML = filteredCodes.map((code) => `<option value="${code}">${code} - ${latest.rows[code].country}</option>`).join('');
+  currency.innerHTML = filteredCodes.map((code) => `<option value="${code}">${code} - ${escapeHtml(latest.rows[code].country)}</option>`).join('');
   return filteredCodes;
 }
 
@@ -241,7 +227,7 @@ function renderRecentUpdates(code, points = []) {
       : (snap.published_at_kst ? toKst(snap.published_at_kst) : '-');
     return `
       <tr class="${index === 0 ? 'is-latest' : ''}">
-        <td>${published}</td>
+        <td>${escapeHtml(published)}</td>
         <td>${snap.sequence || '-'}</td>
         <td>${fmt(currentRate)}</td>
         <td class="${diffClass}">${diffText}</td>
@@ -324,7 +310,7 @@ function updateMetaCompact() {
   const compact = document.getElementById('meta-compact');
   if (!compact) return;
   const published = normalizeDateTimeText(latest?.published_text) || '-';
-  const statusText = fetchStatus?.last_attempt_success ? '정상' : (fetchStatus ? '실패' : '확인 불가');
+  const statusText = getFetchHealth(fetchStatus).label;
   compact.textContent = `고시 ${published} · 수집 ${statusText}`;
 }
 
@@ -341,17 +327,26 @@ function renderFetchStatus() {
     return;
   }
 
-  const attempted = fetchStatus.last_attempt_at_utc ? formatKstDateTime(fetchStatus.last_attempt_at_utc) : '-';
+  const attempted = Number.isFinite(Date.parse(fetchStatus.last_attempt_at_utc))
+    ? formatKstDateTime(fetchStatus.last_attempt_at_utc) : '-';
   const success = !!fetchStatus.last_attempt_success;
   const streak = Number(fetchStatus.failure_streak || 0);
   const total = Number(fetchStatus.total_failures || 0);
 
+  const lastSuccess = fetchStatus.last_success_at_utc || fetchStatus.latest_captured_at_utc;
+  document.getElementById('meta-last-success').textContent = Number.isFinite(Date.parse(lastSuccess))
+    ? `마지막 성공 수집: ${formatKstDateTime(lastSuccess)}` : '마지막 성공 수집: 확인 불가';
+  if (getFetchHealth(fetchStatus).stale) {
+    statusLine.textContent = `수집 상태: 지연 (마지막 시도 ${attempted})`;
+    banner.hidden = false;
+    banner.classList.remove('ok');
+    banner.textContent = `수집 실행 기록이 오래됐습니다. 마지막 시도 ${attempted}`;
+    updateMetaCompact();
+    return;
+  }
+
   if (success) {
     statusLine.textContent = `수집 상태: 정상 (${attempted})`;
-    const lastSuccessLine = fetchStatus.last_attempt_at_utc
-      ? `마지막 성공 수집: ${attempted}`
-      : '마지막 성공 수집: 확인 불가';
-    document.getElementById('meta-last-success').textContent = lastSuccessLine;
     banner.hidden = true;
     banner.classList.remove('ok');
     updateMetaCompact();
@@ -359,7 +354,6 @@ function renderFetchStatus() {
   }
 
   const error = fetchStatus.last_error || '원인 정보 없음';
-  document.getElementById('meta-last-success').textContent = '마지막 성공 수집: 확인 필요';
   statusLine.textContent = `수집 상태: 실패 (${attempted}, 연속 ${streak}회)`;
   banner.hidden = false;
   banner.classList.remove('ok');
@@ -539,8 +533,12 @@ async function checkForDataUpdate() {
     const nextFingerprint = getLatestFingerprint(nextLatest);
     if (latestFingerprint && nextFingerprint && nextFingerprint !== latestFingerprint) {
       await refreshData(nextLatest);
+    } else {
+      fetchStatus = await loadStatus();
+      renderFetchStatus();
     }
   } catch (err) {
+    renderFetchStatus();
     console.warn('자동 갱신 확인 실패', err);
   } finally {
     autoRefreshInFlight = false;
