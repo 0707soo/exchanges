@@ -24,6 +24,7 @@ on:
         type: string
 
 permissions:
+  actions: write
   contents: write
 
 concurrency:
@@ -88,3 +89,9 @@ jobs:
         run: |
           echo "Primary exchange collection failed. See fetch.log and data/status.json for details."
           exit 1
+
+      - name: Dispatch Pages after manual or keeper collection
+        if: always() && github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --repo 0707soo/exchanges
