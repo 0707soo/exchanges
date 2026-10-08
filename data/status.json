@@ -2,34 +2,42 @@
   "source": "hanabank",
   "poll_mode": "scheduled-five-minute-with-manual-dispatch",
   "trigger_reason": "schedule",
-  "window_started_at_utc": "2026-10-08T05:07:28.501207+00:00",
-  "window_ended_at_utc": "2026-10-08T05:07:39.515479+00:00",
+  "window_started_at_utc": "2026-10-08T06:57:56.935258+00:00",
+  "window_ended_at_utc": "2026-10-08T06:58:09.185114+00:00",
   "attempt_count": 1,
-  "last_attempt_at_utc": "2026-10-08T05:07:28.501207+00:00",
-  "last_attempt_success": true,
+  "last_attempt_at_utc": "2026-10-08T06:57:56.935258+00:00",
+  "last_attempt_success": false,
   "last_success_at_utc": "2026-10-08T05:07:35.239174+00:00",
   "warnings": [],
-  "last_error": null,
+  "last_error": "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=266"
+    "    html = fetch_html(now_kst)",
+    "           ^^^^^^^^^^^^^^^^^^^",
+    "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
+    "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
+    "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-10-08T05:07:28.501207+00:00",
-      "exit_code": 0,
-      "changed": true,
-      "sequence_before": 226,
+      "attempted_at_utc": "2026-10-08T06:57:56.935258+00:00",
+      "exit_code": 1,
+      "changed": false,
+      "sequence_before": 266,
       "sequence_after": 266,
       "log_excerpt": [
-        "rows=58 changed=True sequence=266"
+        "    html = fetch_html(now_kst)",
+        "           ^^^^^^^^^^^^^^^^^^^",
+        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
+        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
+        "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
       ]
     }
   ],
   "latest_published_at_kst": "2026-10-08T14:06:00+09:00",
   "latest_captured_at_utc": "2026-10-08T05:07:28.630284+00:00",
   "latest_sequence": 266,
-  "failure_streak": 0,
-  "total_failures": 156,
+  "failure_streak": 1,
+  "total_failures": 157,
   "next_delay_seconds": 300,
   "chain_driver": "github-actions-schedule"
 }
