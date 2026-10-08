@@ -50,7 +50,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           MONITOR_MINUTES: ${{ inputs.monitor_minutes || '330' }}
           STALE_LIMIT_SECONDS: ${{ inputs.stale_limit_seconds || '1800' }}
-          CONTINUE_KEEPER: ${{ inputs.continue_keeper != false }}
+          CONTINUE_KEEPER: ${{ github.event_name != 'workflow_dispatch' || inputs.continue_keeper != false }}
         run: |
           python - <<'PY'
           import json
