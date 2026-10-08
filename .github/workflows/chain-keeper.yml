@@ -1,6 +1,14 @@
 name: chain-keeper
 
 on:
+  # Bootstrap the monitor when this workflow is installed or changed on main.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/chain-keeper.yml'
+  # Backup restart in case the self-redispatching keeper stops.
+  schedule:
+    - cron: '47 */6 * * *'
   workflow_dispatch:
     inputs:
       monitor_minutes:
