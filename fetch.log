@@ -1,12 +1,16 @@
 [
   {
-    "attempted_at_utc": "2026-10-13T13:00:44.126120+00:00",
-    "exit_code": 0,
-    "changed": true,
-    "sequence_before": 765,
+    "attempted_at_utc": "2026-10-13T13:06:08.530815+00:00",
+    "exit_code": 1,
+    "changed": false,
+    "sequence_before": 771,
     "sequence_after": 771,
     "log_excerpt": [
-      "rows=58 changed=True sequence=771"
+      "    html = fetch_html(now_kst)",
+      "           ^^^^^^^^^^^^^^^^^^^",
+      "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
+      "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
+      "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
     ]
   }
 ]
