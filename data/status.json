@@ -1,33 +1,33 @@
 {
   "source": "hanabank",
   "poll_mode": "scheduled-five-minute-with-manual-dispatch",
-  "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-10-14T08:56:12.805757+00:00",
-  "window_ended_at_utc": "2026-10-14T08:56:22.752154+00:00",
+  "trigger_reason": "schedule",
+  "window_started_at_utc": "2026-10-14T09:00:06.348875+00:00",
+  "window_ended_at_utc": "2026-10-14T09:00:17.685987+00:00",
   "attempt_count": 1,
-  "last_attempt_at_utc": "2026-10-14T08:56:12.805757+00:00",
+  "last_attempt_at_utc": "2026-10-14T09:00:06.348875+00:00",
   "last_attempt_success": true,
-  "last_success_at_utc": "2026-10-14T08:56:18.741558+00:00",
+  "last_success_at_utc": "2026-10-14T09:00:15.074520+00:00",
   "warnings": [],
   "last_error": null,
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=526"
+    "rows=58 changed=True sequence=528"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-10-14T08:56:12.805757+00:00",
+      "attempted_at_utc": "2026-10-14T09:00:06.348875+00:00",
       "exit_code": 0,
       "changed": true,
-      "sequence_before": 525,
-      "sequence_after": 526,
+      "sequence_before": 526,
+      "sequence_after": 528,
       "log_excerpt": [
-        "rows=58 changed=True sequence=526"
+        "rows=58 changed=True sequence=528"
       ]
     }
   ],
-  "latest_published_at_kst": "2026-10-14T17:51:00+09:00",
-  "latest_captured_at_utc": "2026-10-14T08:56:12.901114+00:00",
-  "latest_sequence": 526,
+  "latest_published_at_kst": "2026-10-14T17:57:00+09:00",
+  "latest_captured_at_utc": "2026-10-14T09:00:06.418917+00:00",
+  "latest_sequence": 528,
   "failure_streak": 0,
   "total_failures": 227,
   "next_delay_seconds": 300,
