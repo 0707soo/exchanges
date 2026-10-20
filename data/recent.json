@@ -722,188 +722,6 @@
   },
   "snapshots": [
     {
-      "published_text": "2026년10월19일 20시23분00초",
-      "published_at_kst": "2026-10-19T20:23:00+09:00",
-      "captured_at_utc": "2026-10-19T11:23:53.087384+00:00",
-      "sequence": 648,
-      "rows": {
-        "USD": {
-          "base_rate": 1329.6
-        },
-        "JPY": {
-          "base_rate": 840.88
-        },
-        "EUR": {
-          "base_rate": 1493.21
-        },
-        "CNY": {
-          "base_rate": 199.07
-        },
-        "HKD": {
-          "base_rate": 169.41
-        },
-        "THB": {
-          "base_rate": 39.64
-        },
-        "TWD": {
-          "base_rate": 40.95
-        },
-        "PHP": {
-          "base_rate": 21.12
-        },
-        "SGD": {
-          "base_rate": 1039.77
-        },
-        "AUD": {
-          "base_rate": 929.52
-        },
-        "VND": {
-          "base_rate": 5.15
-        },
-        "GBP": {
-          "base_rate": 1773.89
-        },
-        "CAD": {
-          "base_rate": 944.62
-        },
-        "MYR": {
-          "base_rate": 325.68
-        },
-        "RUB": {
-          "base_rate": 16.08
-        },
-        "ZAR": {
-          "base_rate": 80.99
-        },
-        "NOK": {
-          "base_rate": 141.45
-        },
-        "NZD": {
-          "base_rate": 754.15
-        },
-        "DKK": {
-          "base_rate": 199.76
-        },
-        "MXN": {
-          "base_rate": 71.99
-        },
-        "MNT": {
-          "base_rate": 0.37
-        },
-        "BHD": {
-          "base_rate": 3521.37
-        },
-        "BDT": {
-          "base_rate": 10.75
-        },
-        "BRL": {
-          "base_rate": 262.63
-        },
-        "BND": {
-          "base_rate": 1039.77
-        },
-        "SAR": {
-          "base_rate": 354.33
-        },
-        "LKR": {
-          "base_rate": 4.01
-        },
-        "SEK": {
-          "base_rate": 134.47
-        },
-        "CHF": {
-          "base_rate": 1612.42
-        },
-        "AED": {
-          "base_rate": 362.02
-        },
-        "DZD": {
-          "base_rate": 9.89
-        },
-        "OMR": {
-          "base_rate": 3453.42
-        },
-        "JOD": {
-          "base_rate": 1875.32
-        },
-        "ILS": {
-          "base_rate": 428.05
-        },
-        "EGP": {
-          "base_rate": 24.65
-        },
-        "INR": {
-          "base_rate": 14.01
-        },
-        "IDR": {
-          "base_rate": 7.39
-        },
-        "CZK": {
-          "base_rate": 61.36
-        },
-        "CLP": {
-          "base_rate": 1.35
-        },
-        "KZT": {
-          "base_rate": 2.94
-        },
-        "QAR": {
-          "base_rate": 364.77
-        },
-        "KES": {
-          "base_rate": 10.25
-        },
-        "COP": {
-          "base_rate": 0.42
-        },
-        "KWD": {
-          "base_rate": 4275.52
-        },
-        "TZS": {
-          "base_rate": 0.5
-        },
-        "TRY": {
-          "base_rate": 26.83
-        },
-        "PKR": {
-          "base_rate": 4.8
-        },
-        "PLN": {
-          "base_rate": 341.72
-        },
-        "HUF": {
-          "base_rate": 4.12
-        },
-        "NPR": {
-          "base_rate": 8.75
-        },
-        "MOP": {
-          "base_rate": 164.49
-        },
-        "KHR": {
-          "base_rate": 0.33
-        },
-        "FJD": {
-          "base_rate": 588.48
-        },
-        "LYD": {
-          "base_rate": 207.16
-        },
-        "RON": {
-          "base_rate": 280.34
-        },
-        "MMK": {
-          "base_rate": 0.63
-        },
-        "ETB": {
-          "base_rate": 8.14
-        },
-        "UZS": {
-          "base_rate": 0.11
-        }
-      }
-    },
-    {
       "published_text": "2026년10월19일 20시29분00초",
       "published_at_kst": "2026-10-19T20:29:00+09:00",
       "captured_at_utc": "2026-10-19T11:29:09.495045+00:00",
@@ -18915,6 +18733,188 @@
         },
         "ETB": {
           "base_rate": 8.25
+        },
+        "UZS": {
+          "base_rate": 0.11
+        }
+      }
+    },
+    {
+      "published_text": "2026년10월20일 09시01분00초",
+      "published_at_kst": "2026-10-20T09:01:00+09:00",
+      "captured_at_utc": "2026-10-20T00:01:51.460072+00:00",
+      "sequence": 14,
+      "rows": {
+        "USD": {
+          "base_rate": 1327.8
+        },
+        "JPY": {
+          "base_rate": 837.49
+        },
+        "EUR": {
+          "base_rate": 1489.39
+        },
+        "CNY": {
+          "base_rate": 198.72
+        },
+        "HKD": {
+          "base_rate": 169.19
+        },
+        "THB": {
+          "base_rate": 39.54
+        },
+        "TWD": {
+          "base_rate": 40.86
+        },
+        "PHP": {
+          "base_rate": 21.08
+        },
+        "SGD": {
+          "base_rate": 1037.59
+        },
+        "AUD": {
+          "base_rate": 927.34
+        },
+        "VND": {
+          "base_rate": 5.13
+        },
+        "GBP": {
+          "base_rate": 1767.7
+        },
+        "CAD": {
+          "base_rate": 941.6
+        },
+        "MYR": {
+          "base_rate": 325.24
+        },
+        "RUB": {
+          "base_rate": 16.05
+        },
+        "ZAR": {
+          "base_rate": 80.87
+        },
+        "NOK": {
+          "base_rate": 140.98
+        },
+        "NZD": {
+          "base_rate": 752.66
+        },
+        "DKK": {
+          "base_rate": 199.25
+        },
+        "MXN": {
+          "base_rate": 72.08
+        },
+        "MNT": {
+          "base_rate": 0.37
+        },
+        "BHD": {
+          "base_rate": 3517.35
+        },
+        "BDT": {
+          "base_rate": 10.74
+        },
+        "BRL": {
+          "base_rate": 263.43
+        },
+        "BND": {
+          "base_rate": 1037.59
+        },
+        "SAR": {
+          "base_rate": 353.85
+        },
+        "LKR": {
+          "base_rate": 4.01
+        },
+        "SEK": {
+          "base_rate": 133.91
+        },
+        "CHF": {
+          "base_rate": 1606.34
+        },
+        "AED": {
+          "base_rate": 361.54
+        },
+        "DZD": {
+          "base_rate": 9.88
+        },
+        "OMR": {
+          "base_rate": 3448.74
+        },
+        "JOD": {
+          "base_rate": 1872.78
+        },
+        "ILS": {
+          "base_rate": 428.2
+        },
+        "EGP": {
+          "base_rate": 24.63
+        },
+        "INR": {
+          "base_rate": 13.99
+        },
+        "IDR": {
+          "base_rate": 7.36
+        },
+        "CZK": {
+          "base_rate": 61.21
+        },
+        "CLP": {
+          "base_rate": 1.35
+        },
+        "KZT": {
+          "base_rate": 2.94
+        },
+        "QAR": {
+          "base_rate": 364.58
+        },
+        "KES": {
+          "base_rate": 10.22
+        },
+        "COP": {
+          "base_rate": 0.42
+        },
+        "KWD": {
+          "base_rate": 4268.08
+        },
+        "TZS": {
+          "base_rate": 0.5
+        },
+        "TRY": {
+          "base_rate": 26.78
+        },
+        "PKR": {
+          "base_rate": 4.8
+        },
+        "PLN": {
+          "base_rate": 340.78
+        },
+        "HUF": {
+          "base_rate": 4.11
+        },
+        "NPR": {
+          "base_rate": 8.74
+        },
+        "MOP": {
+          "base_rate": 164.15
+        },
+        "KHR": {
+          "base_rate": 0.33
+        },
+        "FJD": {
+          "base_rate": 588.08
+        },
+        "LYD": {
+          "base_rate": 206.96
+        },
+        "RON": {
+          "base_rate": 279.68
+        },
+        "MMK": {
+          "base_rate": 0.63
+        },
+        "ETB": {
+          "base_rate": 8.23
         },
         "UZS": {
           "base_rate": 0.11
