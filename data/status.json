@@ -1,35 +1,43 @@
 {
   "source": "hanabank",
   "poll_mode": "scheduled-five-minute-with-manual-dispatch",
-  "trigger_reason": "schedule",
-  "window_started_at_utc": "2026-10-20T19:39:28.919883+00:00",
-  "window_ended_at_utc": "2026-10-20T19:39:43.362735+00:00",
+  "trigger_reason": "chain-keeper",
+  "window_started_at_utc": "2026-10-20T19:41:39.157231+00:00",
+  "window_ended_at_utc": "2026-10-20T19:42:12.528000+00:00",
   "attempt_count": 1,
-  "last_attempt_at_utc": "2026-10-20T19:39:28.919883+00:00",
-  "last_attempt_success": true,
+  "last_attempt_at_utc": "2026-10-20T19:41:39.157231+00:00",
+  "last_attempt_success": false,
   "last_success_at_utc": "2026-10-20T19:39:39.231798+00:00",
   "warnings": [],
-  "last_error": null,
+  "last_error": "RuntimeError: 환율 수집 실패: ('Connection broken: IncompleteRead(3444 bytes read, 646 more expected)', IncompleteRead(3444 bytes read, 646 more expected))",
   "last_log_excerpt": [
-    "rows=58 changed=True sequence=821"
+    "    html = fetch_html(now_kst)",
+    "           ^^^^^^^^^^^^^^^^^^^",
+    "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
+    "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
+    "RuntimeError: 환율 수집 실패: ('Connection broken: IncompleteRead(3444 bytes read, 646 more expected)', IncompleteRead(3444 bytes read, 646 more expected))"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-10-20T19:39:28.919883+00:00",
-      "exit_code": 0,
-      "changed": true,
-      "sequence_before": 820,
+      "attempted_at_utc": "2026-10-20T19:41:39.157231+00:00",
+      "exit_code": 1,
+      "changed": false,
+      "sequence_before": 821,
       "sequence_after": 821,
       "log_excerpt": [
-        "rows=58 changed=True sequence=821"
+        "    html = fetch_html(now_kst)",
+        "           ^^^^^^^^^^^^^^^^^^^",
+        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
+        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
+        "RuntimeError: 환율 수집 실패: ('Connection broken: IncompleteRead(3444 bytes read, 646 more expected)', IncompleteRead(3444 bytes read, 646 more expected))"
       ]
     }
   ],
   "latest_published_at_kst": "2026-10-20T21:04:00+09:00",
   "latest_captured_at_utc": "2026-10-20T19:39:29.040739+00:00",
   "latest_sequence": 821,
-  "failure_streak": 0,
-  "total_failures": 317,
+  "failure_streak": 1,
+  "total_failures": 318,
   "next_delay_seconds": 300,
   "chain_driver": "github-actions-schedule"
 }
