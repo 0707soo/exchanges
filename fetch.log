@@ -1,16 +1,12 @@
 [
   {
-    "attempted_at_utc": "2026-10-20T19:30:58.775513+00:00",
-    "exit_code": 1,
-    "changed": false,
+    "attempted_at_utc": "2026-10-20T19:36:21.020855+00:00",
+    "exit_code": 0,
+    "changed": true,
     "sequence_before": 817,
-    "sequence_after": 817,
+    "sequence_after": 820,
     "log_excerpt": [
-      "    html = fetch_html(now_kst)",
-      "           ^^^^^^^^^^^^^^^^^^^",
-      "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
-      "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-      "RuntimeError: 환율 수집 실패: ('Connection broken: IncompleteRead(159 bytes read, 3937 more expected)', IncompleteRead(159 bytes read, 3937 more expected))"
+      "rows=58 changed=True sequence=820"
     ]
   }
 ]
