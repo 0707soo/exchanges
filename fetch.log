@@ -1,6 +1,6 @@
 [
   {
-    "attempted_at_utc": "2026-10-21T03:17:54.605913+00:00",
+    "attempted_at_utc": "2026-10-21T03:23:10.735779+00:00",
     "exit_code": 1,
     "changed": false,
     "sequence_before": 230,
@@ -10,7 +10,7 @@
       "           ^^^^^^^^^^^^^^^^^^^",
       "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
       "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-      "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+      "RuntimeError: 환율 수집 실패: ('Connection broken: IncompleteRead(2535 bytes read, 1561 more expected)', IncompleteRead(2535 bytes read, 1561 more expected))"
     ]
   }
 ]
