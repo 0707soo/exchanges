@@ -1,12 +1,16 @@
 [
   {
-    "attempted_at_utc": "2026-11-04T01:13:50.750220+00:00",
-    "exit_code": 0,
-    "changed": true,
-    "sequence_before": 147,
+    "attempted_at_utc": "2026-11-04T01:19:09.688971+00:00",
+    "exit_code": 1,
+    "changed": false,
+    "sequence_before": 154,
     "sequence_after": 154,
     "log_excerpt": [
-      "rows=58 changed=True sequence=154"
+      "    rows = extract_rows(html)",
+      "           ^^^^^^^^^^^^^^^^^^",
+      "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 210, in extract_rows",
+      "    raise RuntimeError(\"환율 테이블 파싱 실패\")",
+      "RuntimeError: 환율 테이블 파싱 실패"
     ]
   }
 ]
