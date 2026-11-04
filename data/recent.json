@@ -67,191 +67,660 @@
         "ETB": 8.3,
         "UZS": 0.11
       }
+    },
+    "2026-11-05": {
+      "source": "https://hanabank.com/cont/mall/mall15/mall1501/index.jsp",
+      "captured_at_utc": "2026-11-04T23:28:03.276164+00:00",
+      "basis_date_text": "2026년11월05일",
+      "published_text": "2026년11월05일 08시27분00초",
+      "published_at_kst": "2026-11-05T08:27:00+09:00",
+      "sequence": 1,
+      "viewed_text": "2026년11월05일 08시28분08초",
+      "rates": {
+        "USD": 1340.7,
+        "JPY": 846.35,
+        "EUR": 1506.14,
+        "CNY": 200.52,
+        "HKD": 170.9,
+        "THB": 39.89,
+        "TWD": 40.83,
+        "PHP": 21.13,
+        "SGD": 1048.28,
+        "AUD": 939.03,
+        "VND": 5.22,
+        "GBP": 1806.39,
+        "CAD": 959.53,
+        "MYR": 329.9,
+        "RUB": 16.39,
+        "ZAR": 81.69,
+        "NOK": 144.3,
+        "NZD": 753.61,
+        "DKK": 201.49,
+        "MXN": 72.02,
+        "MNT": 0.37,
+        "BHD": 3552.75,
+        "BDT": 10.77,
+        "BRL": 245.61,
+        "BND": 1048.28,
+        "SAR": 357.21,
+        "LKR": 4.03,
+        "SEK": 137.76,
+        "CHF": 1641.51,
+        "AED": 365.02,
+        "DZD": 9.86,
+        "OMR": 3482.16,
+        "JOD": 1890.97,
+        "ILS": 424.8,
+        "EGP": 24.5,
+        "INR": 14.18,
+        "IDR": 7.38,
+        "CZK": 62.02,
+        "CLP": 1.39,
+        "KZT": 2.96,
+        "QAR": 367.8,
+        "KES": 10.32,
+        "COP": 0.42,
+        "KWD": 4355.04,
+        "TZS": 0.51,
+        "TRY": 26.8,
+        "PKR": 4.85,
+        "PLN": 343.3,
+        "HUF": 4.15,
+        "NPR": 8.85,
+        "MOP": 165.83,
+        "KHR": 0.33,
+        "FJD": 597.35,
+        "LYD": 209.17,
+        "RON": 281.99,
+        "MMK": 0.64,
+        "ETB": 8.31,
+        "UZS": 0.11
+      },
+      "rows": {
+        "USD": {
+          "country": "미국",
+          "unit_label": null,
+          "cash_buy": 1364.16,
+          "cash_sell": 1317.24,
+          "send": 1353.8,
+          "receive": 1327.6,
+          "base_rate": 1340.7,
+          "usd_rate": 1.0
+        },
+        "JPY": {
+          "country": "일본",
+          "unit_label": "100",
+          "cash_buy": 861.16,
+          "cash_sell": 831.54,
+          "send": 854.64,
+          "receive": 838.06,
+          "base_rate": 846.35,
+          "usd_rate": 0.6313
+        },
+        "EUR": {
+          "country": "유로",
+          "unit_label": null,
+          "cash_buy": 1536.11,
+          "cash_sell": 1476.17,
+          "send": 1521.2,
+          "receive": 1491.08,
+          "base_rate": 1506.14,
+          "usd_rate": 1.1234
+        },
+        "CNY": {
+          "country": "중국",
+          "unit_label": null,
+          "cash_buy": 210.54,
+          "cash_sell": 190.5,
+          "send": 202.52,
+          "receive": 198.52,
+          "base_rate": 200.52,
+          "usd_rate": 0.1496
+        },
+        "HKD": {
+          "country": "홍콩",
+          "unit_label": null,
+          "cash_buy": 174.26,
+          "cash_sell": 167.54,
+          "send": 172.6,
+          "receive": 169.2,
+          "base_rate": 170.9,
+          "usd_rate": 0.1275
+        },
+        "THB": {
+          "country": "태국",
+          "unit_label": null,
+          "cash_buy": 41.88,
+          "cash_sell": 37.5,
+          "send": 40.28,
+          "receive": 39.5,
+          "base_rate": 39.89,
+          "usd_rate": 0.0298
+        },
+        "TWD": {
+          "country": "대만",
+          "unit_label": null,
+          "cash_buy": 46.17,
+          "cash_sell": 36.75,
+          "send": 41.27,
+          "receive": 40.39,
+          "base_rate": 40.83,
+          "usd_rate": 0.0305
+        },
+        "PHP": {
+          "country": "필리핀",
+          "unit_label": null,
+          "cash_buy": 23.24,
+          "cash_sell": 19.4,
+          "send": 21.34,
+          "receive": 20.92,
+          "base_rate": 21.13,
+          "usd_rate": 0.0158
+        },
+        "SGD": {
+          "country": "싱가포르",
+          "unit_label": null,
+          "cash_buy": 1069.14,
+          "cash_sell": 1027.42,
+          "send": 1058.76,
+          "receive": 1037.8,
+          "base_rate": 1048.28,
+          "usd_rate": 0.7819
+        },
+        "AUD": {
+          "country": "호주",
+          "unit_label": null,
+          "cash_buy": 957.52,
+          "cash_sell": 920.54,
+          "send": 948.42,
+          "receive": 929.64,
+          "base_rate": 939.03,
+          "usd_rate": 0.7004
+        },
+        "VND": {
+          "country": "베트남",
+          "unit_label": "100",
+          "cash_buy": 5.83,
+          "cash_sell": 4.61,
+          "send": 5.27,
+          "receive": 5.17,
+          "base_rate": 5.22,
+          "usd_rate": 0.0039
+        },
+        "GBP": {
+          "country": "영국",
+          "unit_label": null,
+          "cash_buy": 1841.97,
+          "cash_sell": 1770.81,
+          "send": 1824.45,
+          "receive": 1788.33,
+          "base_rate": 1806.39,
+          "usd_rate": 1.3473
+        },
+        "CAD": {
+          "country": "캐나다",
+          "unit_label": null,
+          "cash_buy": 978.43,
+          "cash_sell": 940.63,
+          "send": 969.12,
+          "receive": 949.94,
+          "base_rate": 959.53,
+          "usd_rate": 0.7157
+        },
+        "MYR": {
+          "country": "말레이시아",
+          "unit_label": null,
+          "cash_buy": 354.31,
+          "cash_sell": 305.49,
+          "send": 333.19,
+          "receive": 326.61,
+          "base_rate": 329.9,
+          "usd_rate": 0.2461
+        },
+        "RUB": {
+          "country": "러시아",
+          "unit_label": null,
+          "cash_buy": 17.94,
+          "cash_sell": 13.53,
+          "send": 16.96,
+          "receive": 15.82,
+          "base_rate": 16.39,
+          "usd_rate": 0.0122
+        },
+        "ZAR": {
+          "country": "남아공화국",
+          "unit_label": null,
+          "cash_buy": 88.22,
+          "cash_sell": 75.16,
+          "send": 82.67,
+          "receive": 80.71,
+          "base_rate": 81.69,
+          "usd_rate": 0.0609
+        },
+        "NOK": {
+          "country": "노르웨이",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 145.74,
+          "receive": 142.86,
+          "base_rate": 144.3,
+          "usd_rate": 0.1076
+        },
+        "NZD": {
+          "country": "뉴질랜드",
+          "unit_label": null,
+          "cash_buy": 768.45,
+          "cash_sell": 738.77,
+          "send": 761.14,
+          "receive": 746.08,
+          "base_rate": 753.61,
+          "usd_rate": 0.5621
+        },
+        "DKK": {
+          "country": "덴마크",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 203.5,
+          "receive": 199.48,
+          "base_rate": 201.49,
+          "usd_rate": 0.1503
+        },
+        "MXN": {
+          "country": "멕시코",
+          "unit_label": null,
+          "cash_buy": 79.58,
+          "cash_sell": 64.46,
+          "send": 72.74,
+          "receive": 71.3,
+          "base_rate": 72.02,
+          "usd_rate": 0.0537
+        },
+        "MNT": {
+          "country": "몽골",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 0.37,
+          "receive": 0.37,
+          "base_rate": 0.37,
+          "usd_rate": 0.0003
+        },
+        "BHD": {
+          "country": "바레인",
+          "unit_label": null,
+          "cash_buy": 3780.12,
+          "cash_sell": 3268.53,
+          "send": 3588.27,
+          "receive": 3517.23,
+          "base_rate": 3552.75,
+          "usd_rate": 2.6499
+        },
+        "BDT": {
+          "country": "방글라데시",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 10.89,
+          "receive": 10.65,
+          "base_rate": 10.77,
+          "usd_rate": 0.008
+        },
+        "BRL": {
+          "country": "브라질",
+          "unit_label": null,
+          "cash_buy": 270.66,
+          "cash_sell": 221.05,
+          "send": 248.55,
+          "receive": 242.67,
+          "base_rate": 245.61,
+          "usd_rate": 0.1832
+        },
+        "BND": {
+          "country": "브루나이",
+          "unit_label": null,
+          "cash_buy": 1090.21,
+          "cash_sell": 985.39,
+          "send": 1060.85,
+          "receive": 1035.71,
+          "base_rate": 1048.28,
+          "usd_rate": 0.7819
+        },
+        "SAR": {
+          "country": "사우디아라비아",
+          "unit_label": null,
+          "cash_buy": 379.71,
+          "cash_sell": 332.57,
+          "send": 360.78,
+          "receive": 353.64,
+          "base_rate": 357.21,
+          "usd_rate": 0.2664
+        },
+        "LKR": {
+          "country": "스리랑카",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 4.07,
+          "receive": 3.99,
+          "base_rate": 4.03,
+          "usd_rate": 0.003
+        },
+        "SEK": {
+          "country": "스웨덴",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 139.13,
+          "receive": 136.39,
+          "base_rate": 137.76,
+          "usd_rate": 0.1028
+        },
+        "CHF": {
+          "country": "스위스",
+          "unit_label": null,
+          "cash_buy": 1673.84,
+          "cash_sell": 1609.18,
+          "send": 1657.92,
+          "receive": 1625.1,
+          "base_rate": 1641.51,
+          "usd_rate": 1.2244
+        },
+        "AED": {
+          "country": "아랍에미리트공화국",
+          "unit_label": null,
+          "cash_buy": 385.09,
+          "cash_sell": 339.84,
+          "send": 368.67,
+          "receive": 361.37,
+          "base_rate": 365.02,
+          "usd_rate": 0.2723
+        },
+        "DZD": {
+          "country": "알제리",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 9.97,
+          "receive": 9.75,
+          "base_rate": 9.86,
+          "usd_rate": 0.0074
+        },
+        "OMR": {
+          "country": "오만",
+          "unit_label": null,
+          "cash_buy": 3725.91,
+          "cash_sell": 3238.41,
+          "send": 3523.94,
+          "receive": 3440.38,
+          "base_rate": 3482.16,
+          "usd_rate": 2.5973
+        },
+        "JOD": {
+          "country": "요르단",
+          "unit_label": null,
+          "cash_buy": 2059.26,
+          "cash_sell": 1739.7,
+          "send": 1913.66,
+          "receive": 1868.28,
+          "base_rate": 1890.97,
+          "usd_rate": 1.4104
+        },
+        "ILS": {
+          "country": "이스라엘",
+          "unit_label": null,
+          "cash_buy": 467.28,
+          "cash_sell": 390.82,
+          "send": 429.89,
+          "receive": 419.71,
+          "base_rate": 424.8,
+          "usd_rate": 0.3168
+        },
+        "EGP": {
+          "country": "이집트",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 24.79,
+          "receive": 24.21,
+          "base_rate": 24.5,
+          "usd_rate": 0.0183
+        },
+        "INR": {
+          "country": "인도",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 14.34,
+          "receive": 14.02,
+          "base_rate": 14.18,
+          "usd_rate": 0.0106
+        },
+        "IDR": {
+          "country": "인도네시아",
+          "unit_label": "100",
+          "cash_buy": 8.11,
+          "cash_sell": 6.65,
+          "send": 7.45,
+          "receive": 7.31,
+          "base_rate": 7.38,
+          "usd_rate": 0.0055
+        },
+        "CZK": {
+          "country": "체코",
+          "unit_label": null,
+          "cash_buy": 67.29,
+          "cash_sell": 56.44,
+          "send": 62.7,
+          "receive": 61.34,
+          "base_rate": 62.02,
+          "usd_rate": 0.0463
+        },
+        "CLP": {
+          "country": "칠레",
+          "unit_label": null,
+          "cash_buy": 1.52,
+          "cash_sell": 1.26,
+          "send": 1.4,
+          "receive": 1.38,
+          "base_rate": 1.39,
+          "usd_rate": 0.001
+        },
+        "KZT": {
+          "country": "카자흐스탄",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 2.99,
+          "receive": 2.93,
+          "base_rate": 2.96,
+          "usd_rate": 0.0022
+        },
+        "QAR": {
+          "country": "카타르",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 372.21,
+          "receive": 363.39,
+          "base_rate": 367.8,
+          "usd_rate": 0.2743
+        },
+        "KES": {
+          "country": "케냐",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 10.44,
+          "receive": 10.2,
+          "base_rate": 10.32,
+          "usd_rate": 0.0077
+        },
+        "COP": {
+          "country": "콜롬비아",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 0.42,
+          "receive": 0.42,
+          "base_rate": 0.42,
+          "usd_rate": 0.0003
+        },
+        "KWD": {
+          "country": "쿠웨이트",
+          "unit_label": null,
+          "cash_buy": 4638.11,
+          "cash_sell": 4006.64,
+          "send": 4398.59,
+          "receive": 4311.49,
+          "base_rate": 4355.04,
+          "usd_rate": 3.2483
+        },
+        "TZS": {
+          "country": "탄자니아",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 0.51,
+          "receive": 0.51,
+          "base_rate": 0.51,
+          "usd_rate": 0.0004
+        },
+        "TRY": {
+          "country": "튀르키예",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 27.09,
+          "receive": 26.51,
+          "base_rate": 26.8,
+          "usd_rate": 0.02
+        },
+        "PKR": {
+          "country": "파키스탄",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 4.9,
+          "receive": 4.8,
+          "base_rate": 4.85,
+          "usd_rate": 0.0036
+        },
+        "PLN": {
+          "country": "폴란드",
+          "unit_label": null,
+          "cash_buy": 370.76,
+          "cash_sell": 315.84,
+          "send": 347.07,
+          "receive": 339.53,
+          "base_rate": 343.3,
+          "usd_rate": 0.2561
+        },
+        "HUF": {
+          "country": "헝가리",
+          "unit_label": null,
+          "cash_buy": 4.53,
+          "cash_sell": 3.82,
+          "send": 4.19,
+          "receive": 4.11,
+          "base_rate": 4.15,
+          "usd_rate": 0.0031
+        },
+        "NPR": {
+          "country": "네팔",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 8.95,
+          "receive": 8.75,
+          "base_rate": 8.85,
+          "usd_rate": 0.0066
+        },
+        "MOP": {
+          "country": "마카오",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 167.81,
+          "receive": 163.85,
+          "base_rate": 165.83,
+          "usd_rate": 0.1237
+        },
+        "KHR": {
+          "country": "캄보디아",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 0.33,
+          "receive": 0.33,
+          "base_rate": 0.33,
+          "usd_rate": 0.0002
+        },
+        "FJD": {
+          "country": "피지",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 604.51,
+          "receive": 590.19,
+          "base_rate": 597.35,
+          "usd_rate": 0.4456
+        },
+        "LYD": {
+          "country": "리비아",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 211.68,
+          "receive": 206.66,
+          "base_rate": 209.17,
+          "usd_rate": 0.156
+        },
+        "RON": {
+          "country": "루마니아",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 285.09,
+          "receive": 278.89,
+          "base_rate": 281.99,
+          "usd_rate": 0.2103
+        },
+        "MMK": {
+          "country": "미얀마",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 0.64,
+          "receive": 0.64,
+          "base_rate": 0.64,
+          "usd_rate": 0.0005
+        },
+        "ETB": {
+          "country": "에티오피아",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 8.4,
+          "receive": 8.22,
+          "base_rate": 8.31,
+          "usd_rate": 0.0062
+        },
+        "UZS": {
+          "country": "우즈베키스탄",
+          "unit_label": null,
+          "cash_buy": 0.0,
+          "cash_sell": 0.0,
+          "send": 0.11,
+          "receive": 0.11,
+          "base_rate": 0.11,
+          "usd_rate": 0.0001
+        }
+      }
     }
   },
   "snapshots": [
-    {
-      "published_text": "2026년11월04일 20시10분00초",
-      "published_at_kst": "2026-11-04T20:10:00+09:00",
-      "captured_at_utc": "2026-11-04T11:11:57.177496+00:00",
-      "sequence": 810,
-      "rows": {
-        "USD": {
-          "base_rate": 1340.1
-        },
-        "JPY": {
-          "base_rate": 845.14
-        },
-        "EUR": {
-          "base_rate": 1506.47
-        },
-        "CNY": {
-          "base_rate": 200.83
-        },
-        "HKD": {
-          "base_rate": 170.8
-        },
-        "THB": {
-          "base_rate": 39.82
-        },
-        "TWD": {
-          "base_rate": 40.76
-        },
-        "PHP": {
-          "base_rate": 21.08
-        },
-        "SGD": {
-          "base_rate": 1048.14
-        },
-        "AUD": {
-          "base_rate": 939.28
-        },
-        "VND": {
-          "base_rate": 5.22
-        },
-        "GBP": {
-          "base_rate": 1805.72
-        },
-        "CAD": {
-          "base_rate": 959.65
-        },
-        "MYR": {
-          "base_rate": 329.75
-        },
-        "RUB": {
-          "base_rate": 16.35
-        },
-        "ZAR": {
-          "base_rate": 81.41
-        },
-        "NOK": {
-          "base_rate": 145.19
-        },
-        "NZD": {
-          "base_rate": 753.74
-        },
-        "DKK": {
-          "base_rate": 201.57
-        },
-        "MXN": {
-          "base_rate": 71.86
-        },
-        "MNT": {
-          "base_rate": 0.37
-        },
-        "BHD": {
-          "base_rate": 3552.29
-        },
-        "BDT": {
-          "base_rate": 10.76
-        },
-        "BRL": {
-          "base_rate": 244.15
-        },
-        "BND": {
-          "base_rate": 1048.14
-        },
-        "SAR": {
-          "base_rate": 357.03
-        },
-        "LKR": {
-          "base_rate": 4.03
-        },
-        "SEK": {
-          "base_rate": 137.3
-        },
-        "CHF": {
-          "base_rate": 1638.46
-        },
-        "AED": {
-          "base_rate": 364.85
-        },
-        "DZD": {
-          "base_rate": 9.86
-        },
-        "OMR": {
-          "base_rate": 3480.6
-        },
-        "JOD": {
-          "base_rate": 1890.13
-        },
-        "ILS": {
-          "base_rate": 424.32
-        },
-        "EGP": {
-          "base_rate": 24.48
-        },
-        "INR": {
-          "base_rate": 14.16
-        },
-        "IDR": {
-          "base_rate": 7.39
-        },
-        "CZK": {
-          "base_rate": 61.98
-        },
-        "CLP": {
-          "base_rate": 1.38
-        },
-        "KZT": {
-          "base_rate": 2.96
-        },
-        "QAR": {
-          "base_rate": 367.63
-        },
-        "KES": {
-          "base_rate": 10.31
-        },
-        "COP": {
-          "base_rate": 0.41
-        },
-        "KWD": {
-          "base_rate": 4310.67
-        },
-        "TZS": {
-          "base_rate": 0.51
-        },
-        "TRY": {
-          "base_rate": 26.79
-        },
-        "PKR": {
-          "base_rate": 4.84
-        },
-        "PLN": {
-          "base_rate": 342.5
-        },
-        "HUF": {
-          "base_rate": 4.15
-        },
-        "NPR": {
-          "base_rate": 8.85
-        },
-        "MOP": {
-          "base_rate": 165.75
-        },
-        "KHR": {
-          "base_rate": 0.33
-        },
-        "FJD": {
-          "base_rate": 597.22
-        },
-        "LYD": {
-          "base_rate": 209.01
-        },
-        "RON": {
-          "base_rate": 281.87
-        },
-        "MMK": {
-          "base_rate": 0.64
-        },
-        "ETB": {
-          "base_rate": 8.17
-        },
-        "UZS": {
-          "base_rate": 0.11
-        }
-      }
-    },
     {
       "published_text": "2026년11월04일 20시22분00초",
       "published_at_kst": "2026-11-04T20:22:00+09:00",
@@ -18162,6 +18631,188 @@
         },
         "ETB": {
           "base_rate": 8.32
+        },
+        "UZS": {
+          "base_rate": 0.11
+        }
+      }
+    },
+    {
+      "published_text": "2026년11월05일 08시27분00초",
+      "published_at_kst": "2026-11-05T08:27:00+09:00",
+      "captured_at_utc": "2026-11-04T23:28:03.276164+00:00",
+      "sequence": 1,
+      "rows": {
+        "USD": {
+          "base_rate": 1340.7
+        },
+        "JPY": {
+          "base_rate": 846.35
+        },
+        "EUR": {
+          "base_rate": 1506.14
+        },
+        "CNY": {
+          "base_rate": 200.52
+        },
+        "HKD": {
+          "base_rate": 170.9
+        },
+        "THB": {
+          "base_rate": 39.89
+        },
+        "TWD": {
+          "base_rate": 40.83
+        },
+        "PHP": {
+          "base_rate": 21.13
+        },
+        "SGD": {
+          "base_rate": 1048.28
+        },
+        "AUD": {
+          "base_rate": 939.03
+        },
+        "VND": {
+          "base_rate": 5.22
+        },
+        "GBP": {
+          "base_rate": 1806.39
+        },
+        "CAD": {
+          "base_rate": 959.53
+        },
+        "MYR": {
+          "base_rate": 329.9
+        },
+        "RUB": {
+          "base_rate": 16.39
+        },
+        "ZAR": {
+          "base_rate": 81.69
+        },
+        "NOK": {
+          "base_rate": 144.3
+        },
+        "NZD": {
+          "base_rate": 753.61
+        },
+        "DKK": {
+          "base_rate": 201.49
+        },
+        "MXN": {
+          "base_rate": 72.02
+        },
+        "MNT": {
+          "base_rate": 0.37
+        },
+        "BHD": {
+          "base_rate": 3552.75
+        },
+        "BDT": {
+          "base_rate": 10.77
+        },
+        "BRL": {
+          "base_rate": 245.61
+        },
+        "BND": {
+          "base_rate": 1048.28
+        },
+        "SAR": {
+          "base_rate": 357.21
+        },
+        "LKR": {
+          "base_rate": 4.03
+        },
+        "SEK": {
+          "base_rate": 137.76
+        },
+        "CHF": {
+          "base_rate": 1641.51
+        },
+        "AED": {
+          "base_rate": 365.02
+        },
+        "DZD": {
+          "base_rate": 9.86
+        },
+        "OMR": {
+          "base_rate": 3482.16
+        },
+        "JOD": {
+          "base_rate": 1890.97
+        },
+        "ILS": {
+          "base_rate": 424.8
+        },
+        "EGP": {
+          "base_rate": 24.5
+        },
+        "INR": {
+          "base_rate": 14.18
+        },
+        "IDR": {
+          "base_rate": 7.38
+        },
+        "CZK": {
+          "base_rate": 62.02
+        },
+        "CLP": {
+          "base_rate": 1.39
+        },
+        "KZT": {
+          "base_rate": 2.96
+        },
+        "QAR": {
+          "base_rate": 367.8
+        },
+        "KES": {
+          "base_rate": 10.32
+        },
+        "COP": {
+          "base_rate": 0.42
+        },
+        "KWD": {
+          "base_rate": 4355.04
+        },
+        "TZS": {
+          "base_rate": 0.51
+        },
+        "TRY": {
+          "base_rate": 26.8
+        },
+        "PKR": {
+          "base_rate": 4.85
+        },
+        "PLN": {
+          "base_rate": 343.3
+        },
+        "HUF": {
+          "base_rate": 4.15
+        },
+        "NPR": {
+          "base_rate": 8.85
+        },
+        "MOP": {
+          "base_rate": 165.83
+        },
+        "KHR": {
+          "base_rate": 0.33
+        },
+        "FJD": {
+          "base_rate": 597.35
+        },
+        "LYD": {
+          "base_rate": 209.17
+        },
+        "RON": {
+          "base_rate": 281.99
+        },
+        "MMK": {
+          "base_rate": 0.64
+        },
+        "ETB": {
+          "base_rate": 8.31
         },
         "UZS": {
           "base_rate": 0.11
