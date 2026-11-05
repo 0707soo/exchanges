@@ -1,16 +1,12 @@
 [
   {
-    "attempted_at_utc": "2026-11-05T03:16:16.000746+00:00",
-    "exit_code": 1,
-    "changed": false,
+    "attempted_at_utc": "2026-11-05T03:21:42.521823+00:00",
+    "exit_code": 0,
+    "changed": true,
     "sequence_before": 293,
-    "sequence_after": 293,
+    "sequence_after": 297,
     "log_excerpt": [
-      "    html = fetch_html(now_kst)",
-      "           ^^^^^^^^^^^^^^^^^^^",
-      "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
-      "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-      "RuntimeError: 환율 수집 실패: 503 Server Error: Service Unavailable for url: https://hanabank.com/cont/mall/mall15/mall1501/index.jsp"
+      "rows=58 changed=True sequence=297"
     ]
   }
 ]
