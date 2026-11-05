@@ -1,12 +1,12 @@
 [
   {
-    "attempted_at_utc": "2026-11-05T22:25:21.928417+00:00",
+    "attempted_at_utc": "2026-11-05T22:30:34.876195+00:00",
     "exit_code": 0,
-    "changed": false,
+    "changed": true,
     "sequence_before": 1499,
-    "sequence_after": 1499,
+    "sequence_after": 1501,
     "log_excerpt": [
-      "rows=58 changed=False sequence=1499"
+      "rows=58 changed=True sequence=1501"
     ]
   }
 ]
