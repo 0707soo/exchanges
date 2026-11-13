@@ -2,41 +2,33 @@
   "source": "hanabank",
   "poll_mode": "scheduled-five-minute-with-manual-dispatch",
   "trigger_reason": "chain-keeper",
-  "window_started_at_utc": "2026-11-13T05:02:37.675579+00:00",
-  "window_ended_at_utc": "2026-11-13T05:02:50.710464+00:00",
+  "window_started_at_utc": "2026-11-13T05:07:48.274758+00:00",
+  "window_ended_at_utc": "2026-11-13T05:07:57.464603+00:00",
   "attempt_count": 1,
-  "last_attempt_at_utc": "2026-11-13T05:02:37.675579+00:00",
-  "last_attempt_success": false,
-  "last_success_at_utc": "2026-11-13T04:57:20.285005+00:00",
+  "last_attempt_at_utc": "2026-11-13T05:07:48.274758+00:00",
+  "last_attempt_success": true,
+  "last_success_at_utc": "2026-11-13T05:07:54.105037+00:00",
   "warnings": [],
-  "last_error": "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+  "last_error": null,
   "last_log_excerpt": [
-    "    html = fetch_html(now_kst)",
-    "           ^^^^^^^^^^^^^^^^^^^",
-    "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
-    "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-    "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    "rows=58 changed=True sequence=306"
   ],
   "attempt_logs": [
     {
-      "attempted_at_utc": "2026-11-13T05:02:37.675579+00:00",
-      "exit_code": 1,
-      "changed": false,
+      "attempted_at_utc": "2026-11-13T05:07:48.274758+00:00",
+      "exit_code": 0,
+      "changed": true,
       "sequence_before": 297,
-      "sequence_after": 297,
+      "sequence_after": 306,
       "log_excerpt": [
-        "    html = fetch_html(now_kst)",
-        "           ^^^^^^^^^^^^^^^^^^^",
-        "  File \"/home/runner/work/exchanges/exchanges/scripts/fetch_rates.py\", line 154, in fetch_html",
-        "    raise RuntimeError(f\"환율 수집 실패: {last_error}\")",
-        "RuntimeError: 환율 수집 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+        "rows=58 changed=True sequence=306"
       ]
     }
   ],
-  "latest_published_at_kst": "2026-11-13T13:56:00+09:00",
-  "latest_captured_at_utc": "2026-11-13T04:57:15.292825+00:00",
-  "latest_sequence": 297,
-  "failure_streak": 1,
+  "latest_published_at_kst": "2026-11-13T14:04:00+09:00",
+  "latest_captured_at_utc": "2026-11-13T05:07:48.363975+00:00",
+  "latest_sequence": 306,
+  "failure_streak": 0,
   "total_failures": 680,
   "next_delay_seconds": 300,
   "chain_driver": "github-actions-schedule"
